@@ -7,7 +7,6 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 @Data // toString
 @Builder
@@ -27,8 +26,8 @@ public class OrderDTO {
 
     @NotBlank(message = "Phone number cannot be blank")
     @Size(min = 9, message = "Phone number must be at least 9 characters")
-    @JsonProperty("phone_number")
-    private String phoneNumber;
+    @JsonProperty("phone")
+    private String phone;
 
     private String address;
 

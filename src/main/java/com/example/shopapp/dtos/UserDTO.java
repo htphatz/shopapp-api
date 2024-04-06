@@ -14,12 +14,15 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserDTO {
-    @JsonProperty("fullname")
-    private String fullName;
+    @JsonProperty("first_name")
+    private String firstName;
 
-    @JsonProperty("phone_number")
+    @JsonProperty("last_name")
+    private String lastName;
+
+    @JsonProperty("phone")
     @NotBlank(message = "Phone number is required")
-    private String phoneNumber;
+    private String phone;
 
     private String address;
 

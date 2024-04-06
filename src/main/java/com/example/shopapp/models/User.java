@@ -23,11 +23,14 @@ public class User extends BaseEntity implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "fullname", length = 100)
-    private String fullName;
+    @Column(name = "first_name", length = 60)
+    private String firstName;
 
-    @Column(name = "phone_number", length = 10, nullable = false)
-    private String phoneNumber;
+    @Column(name = "last_name", length = 60)
+    private String lastName;
+
+    @Column(name = "phone", length = 10, nullable = false)
+    private String phone;
 
     @Column(name = "address", length = 200)
     private String address;
@@ -56,13 +59,13 @@ public class User extends BaseEntity implements UserDetails {
         List<SimpleGrantedAuthority> authorityList = new ArrayList<>();
         // VD: ROLE_ADMIN
         // authorityList.add(new SimpleGrantedAuthority("ROLE_" + getRole().getName()));
-        authorityList.add(new SimpleGrantedAuthority("ROLE_USER"));
+        authorityList.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
         return authorityList;
     }
 
     @Override
     public String getUsername() {
-        return phoneNumber;
+        return phone;
     }
 
     @Override

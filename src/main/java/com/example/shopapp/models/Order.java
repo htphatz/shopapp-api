@@ -29,8 +29,8 @@ public class Order {
     @Column(name = "email", length = 100)
     private String email;
 
-    @Column(name = "phone_number", length = 20, nullable = false)
-    private String phoneNumber;
+    @Column(name = "phone", length = 16, nullable = false)
+    private String phone;
 
     @Column(name = "address", length = 200, nullable = false)
     private String address;

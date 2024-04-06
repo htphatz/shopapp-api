@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidParameterException;
 import java.security.Key;
 import java.security.SecureRandom;
@@ -34,11 +33,11 @@ public class JwtTokenUtil {
         // Properties => Claims
         Map<String, Object> claims = new HashMap<>();
         // this.generateSecretKey();
-        claims.put("phoneNumber", user.getPhoneNumber());
+        claims.put("phone", user.getPhone());
         try {
             String token = Jwts.builder()
                     .setClaims(claims)
-                    .setSubject(user.getPhoneNumber())
+                    .setSubject(user.getPhone())
                     .setExpiration(new Date(System.currentTimeMillis() + expiration * 1000L))
                     .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                     .compact();

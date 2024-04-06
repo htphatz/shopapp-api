@@ -8,7 +8,6 @@ import com.example.shopapp.models.User;
 import com.example.shopapp.repositories.RoleRepository;
 import com.example.shopapp.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.context.config.ConfigDataLocationNotFoundException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -29,15 +28,16 @@ public class UserService implements IUserService {
     @Override
     // Register
     public User createUser(UserDTO userDTO) throws DataNotFoundException {
-        String phoneNumber = userDTO.getPhoneNumber();
+        String phone = userDTO.getPhone();
         // Kiem tra so dien thoai da dang ky chua
-        if (userRepository.existsByPhoneNumber(phoneNumber)) {
+        if (userRepository.existsByPhone(phone)) {
             throw new DataIntegrityViolationException("Phone number already exist");
         }
         // Convert userDTO -> user
         User newUser = User.builder()
-                .fullName(userDTO.getFullName())
-                .phoneNumber(userDTO.getPhoneNumber())
+                .firstName(userDTO.getFirstName())
+                .lastName(userDTO.getLastName())
+                .phone(userDTO.getPhone())
                 .password(userDTO.getPassword())
                 .address((userDTO.getAddress()))
                 .dateOfBirth(userDTO.getDateOfBirth())
@@ -47,6 +47,7 @@ public class UserService implements IUserService {
         Role existingRole = roleRepository.findById(userDTO.getRoleId())
                 .orElseThrow(() -> new DataNotFoundException("Role not found"));
         newUser.setRole(existingRole);
+        newUser.setActive(true);
         // Kiem tra neu co accountID, khong yeu cau password
         if (userDTO.getFacebookAccountId() == 0 && userDTO.getGoogleAccountId() == 0) {
             String password = userDTO.getPassword();
@@ -58,7 +59,7 @@ public class UserService implements IUserService {
 
     @Override
     public String login(String phoneNumber, String password) throws Exception {
-        Optional<User> optionalUser = userRepository.findByPhoneNumber(phoneNumber);
+        Optional<User> optionalUser = userRepository.findByPhone(phoneNumber);
         if (optionalUser.isEmpty()) {
             throw new DataNotFoundException("Invalid phone number / password");
         }
