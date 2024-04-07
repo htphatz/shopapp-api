@@ -64,10 +64,9 @@ public class OrderService implements IOrderService {
         modelMapper.typeMap(OrderDTO.class, Order.class)
                 .addMappings(mapper -> mapper.skip(Order::setId));
         // Cap nhat order tu orderDTO
-        Order order = new Order();
-        modelMapper.map(orderDTO, order);
-        order.setUser(existingUser);
-        return orderRepository.save(order);
+        modelMapper.map(orderDTO, existingOrder);
+        existingOrder.setUser(existingUser);
+        return orderRepository.save(existingOrder);
     }
 
     @Override
