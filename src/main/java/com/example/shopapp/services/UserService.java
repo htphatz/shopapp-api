@@ -1,6 +1,6 @@
 package com.example.shopapp.services;
 
-import com.example.shopapp.components.JwtTokenUtil;
+import com.example.shopapp.components.JwtTokenUtils;
 import com.example.shopapp.dtos.UserDTO;
 import com.example.shopapp.exceptions.DataNotFoundException;
 import com.example.shopapp.exceptions.PermissionDenyException;
@@ -24,7 +24,7 @@ public class UserService implements IUserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtTokenUtil jwtTokenUtil;
+    private final JwtTokenUtils jwtTokenUtil;
     private final AuthenticationManager authenticationManager;
     @Override
     // Register

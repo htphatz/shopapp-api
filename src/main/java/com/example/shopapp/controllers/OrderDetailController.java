@@ -1,11 +1,13 @@
 package com.example.shopapp.controllers;
 
+import com.example.shopapp.components.LocalizationUtils;
 import com.example.shopapp.dtos.OrderDTO;
 import com.example.shopapp.dtos.OrderDetailDTO;
 import com.example.shopapp.exceptions.DataNotFoundException;
 import com.example.shopapp.models.OrderDetail;
 import com.example.shopapp.responses.OrderDetailResponse;
 import com.example.shopapp.services.OrderDetailService;
+import com.example.shopapp.utils.MessageKeys;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OrderDetailController {
     private final OrderDetailService orderDetailService;
+    private final LocalizationUtils localizationUtils;
 
     @PostMapping("")
     public ResponseEntity<?> createOrderDetail(
@@ -82,6 +85,6 @@ public class OrderDetailController {
     public ResponseEntity<?> deleteOrderDetail(@Valid @PathVariable("id") Long id)
     {
         orderDetailService.deleteById(id);
-        return ResponseEntity.ok().body("Delete OrderDetail with id " + id + " successfully");
+        return ResponseEntity.ok().body(localizationUtils.getLocalizedMessage(MessageKeys.DELETE_ORDER_DETAIL_SUCCESSFULLY, id));
     }
 }
