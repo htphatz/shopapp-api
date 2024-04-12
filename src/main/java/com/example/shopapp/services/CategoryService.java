@@ -6,6 +6,7 @@ import com.example.shopapp.repositories.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 // import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -39,6 +40,7 @@ public class CategoryService implements ICategoryService {
     }
 
     @Override
+    @Transactional
     public Category updateCategory(long id, CategoryDTO categoryDTO) {
         Category existingCategory = categoryRepository.getReferenceById(id);
         existingCategory.setName(categoryDTO.getName());
@@ -47,6 +49,7 @@ public class CategoryService implements ICategoryService {
     }
 
     @Override
+    @Transactional
     public void deleteCategory(long id) {
         // Xoa xong
         categoryRepository.deleteById(id);

@@ -17,7 +17,7 @@ public class ProductImageDTO {
     @JsonProperty("product_id")
     private Long productId;
 
-    @Size(min = 5, max = 200, message = "Name must be between 3 and 200 characters")
+    @Size(min = 1, max = 200, message = "Name must be between 1 and 200 characters")
     @JsonProperty("image_url")
     private String imageUrl;
 }

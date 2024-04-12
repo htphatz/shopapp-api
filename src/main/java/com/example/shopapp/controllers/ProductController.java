@@ -12,6 +12,7 @@ import com.example.shopapp.services.ProductService;
 import com.github.javafaker.Faker;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -84,7 +85,8 @@ public class ProductController {
                 // Luu file va cap nhat thumbnail
                 String filename = storeFile(file);
                 // Luu vao bang products
-                ProductImage productImage =  productService.createProductImage(existingProduct.getId(), ProductImageDTO.builder()
+                ProductImage productImage =  productService.createProductImage(existingProduct.getId(),
+                        ProductImageDTO.builder()
                         .imageUrl(filename)
                         .build()
                 );
@@ -98,15 +100,18 @@ public class ProductController {
 
     @GetMapping("")
     public ResponseEntity<ProductListResponse> getProducts(
-            @RequestParam("page") int page,
-            @RequestParam("limit") int limit
+            @RequestParam(defaultValue = "") String keyword,
+            @RequestParam(defaultValue = "0", name = "category_id") Long categoryId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "12") int limit
     ) {
         // Tao Pageable tu thong tin trang va gioi han
         PageRequest pageRequest = PageRequest.of(
                 page, limit,
-                Sort.by("createdAt").descending()
+                Sort.by(("id")).ascending()
+                // Sort.by("createdAt").descending()
         );
-        Page<ProductResponse> productPage = productService.getAllProducts(pageRequest);
+        Page<ProductResponse> productPage = productService.getAllProducts(keyword, categoryId, pageRequest);
 
         // Lay tong so trang
         int totalPages = productPage.getTotalPages();
@@ -125,6 +130,24 @@ public class ProductController {
             return ResponseEntity.ok(ProductResponse.fromProduct(existingProduct));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/images/{imageName}")
+    public ResponseEntity<?> viewImage(@PathVariable String imageName) {
+        try {
+            Path imagePath = Paths.get("uploads/"+ imageName);
+            UrlResource resource = new UrlResource(imagePath.toUri());
+
+            if (resource.exists()) {
+                return ResponseEntity.ok()
+                        .contentType(MediaType.IMAGE_JPEG)
+                        .body(resource);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
         }
     }
 

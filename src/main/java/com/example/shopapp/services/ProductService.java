@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -47,12 +48,17 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public Page<ProductResponse> getAllProducts(PageRequest pageRequest) {
-        // Lay danh sach san pham theo page va limit
-        return productRepository.findAll(pageRequest).map(ProductResponse::fromProduct);
+    public Page<ProductResponse> getAllProducts(String keyword,
+                                                Long categoryId,
+                                                PageRequest pageRequest) {
+        // Lay danh sach san pham theo page,limit hoac caterotyId (neu co)
+        Page<Product> productsPage;
+        productsPage = productRepository.searchProducts(categoryId, keyword, pageRequest);
+        return productsPage.map(ProductResponse::fromProduct);
     }
 
     @Override
+    @Transactional
     public Product updateProduct(long id, ProductDTO productDTO) throws DataNotFoundException {
         Product existingProduct = getProductById(id);
         if (existingProduct == null) {
@@ -72,6 +78,7 @@ public class ProductService implements IProductService {
     }
 
     @Override
+    @Transactional
     public void deleteProduct(long id) {
         Optional<Product> optionalProduct = productRepository.findById(id);
         if (optionalProduct.isPresent()) {
@@ -86,7 +93,7 @@ public class ProductService implements IProductService {
 
     @Override
     public ProductImage createProductImage(long productId,
-                                            ProductImageDTO productImageDTO) throws DataNotFoundException {
+                                            ProductImageDTO productImageDTO) throws Exception {
         Product existingProduct = productRepository
                 .findById(productId)
                 .orElseThrow(() -> new DataNotFoundException("Product with id " + productImageDTO.getProductId() + " not found"));

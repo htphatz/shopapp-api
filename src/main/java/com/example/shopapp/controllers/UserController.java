@@ -71,7 +71,10 @@ public class UserController {
         // Kiem tra thong tin dang nhap
         // Tra ve thong tin dang nhap va sinh token
         try {
-            String token = userService.login(userLoginDTO.getPhone(), userLoginDTO.getPassword());
+            String token = userService.login(
+                    userLoginDTO.getPhone(),
+                    userLoginDTO.getPassword()
+            );
             // Tra ve token trong response
             return ResponseEntity.ok(LoginResponse.builder()
                             .message(localizationUtils.getLocalizedMessage(MessageKeys.LOGIN_SUCCESSFULLY))

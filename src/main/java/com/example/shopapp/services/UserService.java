@@ -75,6 +75,10 @@ public class UserService implements IUserService {
                 throw new BadCredentialsException("Wrong phone number or password");
             }
         }
+//        Optional<Role> optionalRole = roleRepository.findById(roleId);
+//        if (optionalRole.isEmpty() || !roleId.equals(existingUser.getRole().getId())) {
+//            throw new DataNotFoundException("Role does not exist");
+//        }
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                 phoneNumber, password,
                 existingUser.getAuthorities()

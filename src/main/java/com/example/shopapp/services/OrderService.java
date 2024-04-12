@@ -10,6 +10,7 @@ import com.example.shopapp.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.Date;
@@ -55,6 +56,7 @@ public class OrderService implements IOrderService {
     }
 
     @Override
+    @Transactional
     public Order updateOrder(long id, OrderDTO orderDTO) throws DataNotFoundException {
         Order existingOrder = orderRepository.findById(id)
                 .orElseThrow(() -> new DataNotFoundException("Cannot found order with id " + id));
@@ -70,6 +72,7 @@ public class OrderService implements IOrderService {
     }
 
     @Override
+    @Transactional
     public void deleteOrder(long id) {
         Order order = orderRepository.findById(id).orElse(null);
         // Xoa mem

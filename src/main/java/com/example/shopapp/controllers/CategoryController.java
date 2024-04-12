@@ -63,6 +63,6 @@ public class CategoryController {
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteCategories(@PathVariable Long id) {
         categoryService.deleteCategory(id);
-        return ResponseEntity.ok(localizationUtils.getLocalizedMessage(MessageKeys.DELETE_ORDER_SUCCESSFULLY, id));
+        return ResponseEntity.ok(localizationUtils.getLocalizedMessage(MessageKeys.DELETE_CATEGORY_SUCCESSFULLY, id));
     }
 }
