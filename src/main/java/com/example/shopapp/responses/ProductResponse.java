@@ -21,19 +21,17 @@ import java.util.List;
 @NoArgsConstructor
 public class ProductResponse extends BaseResponse {
     private Long id;
+
     private String name;
 
     private Float price;
 
-    private String thumbnail;
+    private String imageUrl;
 
     private String description;
 
     @JsonProperty("category_id")
     private Long categoryId;
-
-    @JsonProperty("product_images")
-    private List<ProductImage> productImages = new ArrayList<>();
 
     public static ProductResponse fromProduct(Product product) {
         ProductResponse productResponse = ProductResponse.builder()
@@ -41,9 +39,8 @@ public class ProductResponse extends BaseResponse {
                 .name(product.getName())
                 .price(product.getPrice())
                 .description(product.getDescription())
-                .thumbnail(product.getThumbnail())
+                .imageUrl(product.getImageUrl())
                 .categoryId(product.getCategory().getId())
-                .productImages(product.getProductImages())
                 .build();
         productResponse.setCreatedAt(product.getCreatedAt());
         productResponse.setUpdatedAt(product.getUpdatedAt());

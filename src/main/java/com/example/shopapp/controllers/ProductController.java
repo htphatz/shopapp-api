@@ -8,6 +8,8 @@ import com.example.shopapp.models.Product;
 import com.example.shopapp.models.ProductImage;
 import com.example.shopapp.responses.ProductListResponse;
 import com.example.shopapp.responses.ProductResponse;
+import com.example.shopapp.services.CategoryService;
+import com.example.shopapp.services.CloudinaryService;
 import com.example.shopapp.services.ProductService;
 import com.github.javafaker.Faker;
 import jakarta.validation.Valid;
@@ -34,6 +36,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -41,10 +44,12 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ProductController {
     private final ProductService productService;
+    private final CategoryService categoryService;
+    private final CloudinaryService cloudinaryService;
 
-    @PostMapping("")
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> createProduct(
-            @Valid @RequestBody ProductDTO productDTO,
+            ProductDTO productDTO,
             BindingResult result)
     {
         try {
@@ -55,6 +60,14 @@ public class ProductController {
                         .toList();
                 return ResponseEntity.badRequest().body(errorMessages);
             }
+            if (productDTO.getFileImage() == null) {
+                String imageUrl = "https://res.cloudinary.com/drgidfvnd/image/upload/v1713243712/no-image.1024x1024_gyl3zk.png";
+                productDTO.setImageUrl(imageUrl);
+            } else {
+                Map data = this.cloudinaryService.upload(productDTO.getFileImage());
+                String imageUrl = (String) data.get("secure_url");
+                productDTO.setImageUrl(imageUrl);
+            }
             Product newProduct = productService.createProduct(productDTO);
             return ResponseEntity.ok(newProduct);
         } catch (Exception e) {
@@ -62,41 +75,37 @@ public class ProductController {
         }
     }
 
-    @PostMapping(value = "uploads/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> uploadImages(
-            @PathVariable("id") long productId,
-            @ModelAttribute("files") List<MultipartFile> files) {
-        try {
-            Product existingProduct = productService.getProductById(productId);
-            List<ProductImage> productImages = new ArrayList<>();
-            files = (files == null) ? new ArrayList<MultipartFile>() : files;
-            for (MultipartFile file : files) {
-                if (file.getSize() == 0)
-                    continue; // Thoat khoi vong lap
-                if (file.getSize() > 10 * 1024 * 1024) { // Kich thuoc hon 10MB
-                    return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE)
-                            .body("File is too large, Maximum size is 10MB");
-                }
-                String contentType = file.getContentType();
-                if (contentType == null || !contentType.startsWith("image/")) {
-                    return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
-                            .body("File must be an image");
-                }
-                // Luu file va cap nhat thumbnail
-                String filename = storeFile(file);
-                // Luu vao bang products
-                ProductImage productImage =  productService.createProductImage(existingProduct.getId(),
-                        ProductImageDTO.builder()
-                        .imageUrl(filename)
-                        .build()
-                );
-                productImages.add(productImage);
-            }
-            return ResponseEntity.ok().body(productImages);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
+//    @PostMapping(value = "uploads/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+//    public ResponseEntity<?> uploadImages(
+//            @PathVariable("id") long productId,
+//            @ModelAttribute("file") MultipartFile file) {
+//        try {
+//            Product existingProduct = productService.getProductById(productId);
+//                if (file.getSize() == 0)
+//                    return ResponseEntity.status(HttpStatus.NOT_FOUND)
+//                            .body("File not found");
+//                if (file.getSize() > 10 * 1024 * 1024) { // Kich thuoc hon 10MB
+//                    return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE)
+//                            .body("File is too large, Maximum size is 10MB");
+//                }
+//                String contentType = file.getContentType();
+//                if (contentType == null || !contentType.startsWith("image/")) {
+//                    return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
+//                            .body("File must be an image");
+//                }
+//                // Luu file va cap nhat thumbnail
+//                String filename = storeFile(file);
+//                // Luu vao bang products
+//                ProductImage productImage =  productService.createProductImage(existingProduct.getId(),
+//                        ProductImageDTO.builder()
+//                        .imageUrl(filename)
+//                        .build()
+//                );
+//            return ResponseEntity.ok().body(productImage);
+//        } catch (Exception e) {
+//            return ResponseEntity.badRequest().body(e.getMessage());
+//        }
+//    }
 
     @GetMapping("")
     public ResponseEntity<ProductListResponse> getProducts(
@@ -151,27 +160,36 @@ public class ProductController {
         }
     }
 
-    private String storeFile(MultipartFile file) throws IOException {
-        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-        // Them UUID vao truoc ten file de dam bao ten file la duy nhat
-        String uniqueFilename = UUID.randomUUID().toString() + "_" + fileName;
-        Path uploadDir = Paths.get("uploads");
-        // Kiem tra va tao thu muc uploads neu chua ton tai
-        if (!Files.exists(uploadDir)) {
-            Files.createDirectories(uploadDir);
-        }
-        // Duong dan day du cua file
-        Path destination = Paths.get(uploadDir.toString(), uniqueFilename);
-        // Sao chep file vao thu muc dich
-        Files.copy(file.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
-        return uniqueFilename;
-    }
+//    private String storeFile(MultipartFile file) throws IOException {
+//        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+//        // Them UUID vao truoc ten file de dam bao ten file la duy nhat
+//        String uniqueFilename = UUID.randomUUID().toString() + "_" + fileName;
+//        Path uploadDir = Paths.get("uploads");
+//        // Kiem tra va tao thu muc uploads neu chua ton tai
+//        if (!Files.exists(uploadDir)) {
+//            Files.createDirectories(uploadDir);
+//        }
+//        // Duong dan day du cua file
+//        Path destination = Paths.get(uploadDir.toString(), uniqueFilename);
+//        // Sao chep file vao thu muc dich
+//        Files.copy(file.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
+//        return uniqueFilename;
+//    }
 
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateProducts(@PathVariable("id") Long id,
-                                                 ProductDTO productDTO) {
+    public ResponseEntity<?> updateProducts(
+            @PathVariable("id") Long id,
+            ProductDTO productDTO) {
         try {
+            if (productDTO.getFileImage() == null) {
+                String imageUrl = "https://res.cloudinary.com/drgidfvnd/image/upload/v1713243712/no-image.1024x1024_gyl3zk.png";
+                productDTO.setImageUrl(imageUrl);
+            } else {
+                Map data = this.cloudinaryService.upload(productDTO.getFileImage());
+                String imageUrl = (String) data.get("secure_url");
+                productDTO.setImageUrl(imageUrl);
+            }
             Product updatedProduct = productService.updateProduct(id, productDTO);
             return ResponseEntity.ok(updatedProduct);
         } catch (Exception e) {
@@ -201,7 +219,7 @@ public class ProductController {
                     .name(productName)
                     .price((float)faker.number().numberBetween(10, 90000000))
                     .description(faker.lorem().sentence())
-                    .thumbnail("")
+                    .imageUrl("")
                     .categoryId((long)faker.number().numberBetween(5, 9))
                     .build();
             try {

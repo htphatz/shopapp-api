@@ -42,7 +42,7 @@ public class OrderController {
     }
 
     @GetMapping("user/{user_id}")
-    public ResponseEntity<?> getOrders(@Valid @PathVariable("user_id") Long userId)
+    public ResponseEntity<?> getOrdersByUserId(@Valid @PathVariable("user_id") Long userId)
     {
         try {
             List<Order> orders = orderService.findByUserId(userId);
@@ -53,7 +53,7 @@ public class OrderController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getOrder(@Valid @PathVariable("id") long id)
+    public ResponseEntity<?> getOrderById(@Valid @PathVariable("id") long id)
     {
         try {
             Order existingOrder = orderService.getOrderById(id);
@@ -63,7 +63,6 @@ public class OrderController {
         }
     }
 
-    // Cong viec cua admin
     @PutMapping("/{id}")
     public ResponseEntity<?> updateOrder(
             @Valid @PathVariable("id") Long id,
@@ -77,7 +76,6 @@ public class OrderController {
         }
     }
 
-    // Cong viec cua admin
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteOrder(@Valid @PathVariable("id") Long id)
     {

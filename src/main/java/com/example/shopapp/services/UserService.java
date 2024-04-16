@@ -62,8 +62,8 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public String login(String phoneNumber, String password) throws Exception {
-        Optional<User> optionalUser = userRepository.findByPhone(phoneNumber);
+    public String login(String phone, String password) throws Exception {
+        Optional<User> optionalUser = userRepository.findByPhone(phone);
         if (optionalUser.isEmpty()) {
             throw new DataNotFoundException("Invalid phone number / password");
         }
@@ -80,7 +80,7 @@ public class UserService implements IUserService {
 //            throw new DataNotFoundException("Role does not exist");
 //        }
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                phoneNumber, password,
+                phone, password,
                 existingUser.getAuthorities()
         );
         // Authenticate with Java Spring security

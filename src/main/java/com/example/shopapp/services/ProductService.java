@@ -34,7 +34,7 @@ public class ProductService implements IProductService {
         Product newProduct = Product.builder()
                 .name(productDTO.getName())
                 .price(productDTO.getPrice())
-                .thumbnail(productDTO.getThumbnail())
+                .imageUrl(productDTO.getImageUrl())
                 .description(productDTO.getDescription())
                 .category(existingCategory)
                 .build();
@@ -61,7 +61,7 @@ public class ProductService implements IProductService {
     @Transactional
     public Product updateProduct(long id, ProductDTO productDTO) throws DataNotFoundException {
         Product existingProduct = getProductById(id);
-        if (existingProduct == null) {
+        if (existingProduct != null) {
             // Copy cac thuoc tinh tu DTO sang product
             // Co the su dung ModelMapper
             Category existingCategory = categoryRepository
@@ -69,7 +69,7 @@ public class ProductService implements IProductService {
                     .orElseThrow(() -> new DataNotFoundException("Category with id " + productDTO.getCategoryId() + " not found"));
             existingProduct.setName(productDTO.getName());
             existingProduct.setPrice(productDTO.getPrice());
-            existingProduct.setThumbnail(productDTO.getThumbnail());
+            existingProduct.setImageUrl(productDTO.getImageUrl());
             existingProduct.setDescription(productDTO.getDescription());
             existingProduct.setCategory(existingCategory);
             return productRepository.save(existingProduct);
@@ -102,10 +102,10 @@ public class ProductService implements IProductService {
                 .imageUrl(productImageDTO.getImageUrl())
                 .build();
         // Khong cho insert qua' 5 image cho 1 san pham
-        int size = productImageRepository.findByProductId(productId).size();
-        if (size >= 5) {
-            throw new InvalidParamException("Number of image must be <= 5");
-        }
+//        int size = productImageRepository.findByProductId(productId).size();
+//        if (size >= 5) {
+//            throw new InvalidParamException("Number of image must be <= 5");
+//        }
         return productImageRepository.save(newProductImage);
     }
 }

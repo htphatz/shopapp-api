@@ -71,7 +71,6 @@ public class OrderDetailController {
         }
     }
 
-    // Cong viec cua admin
     @PutMapping("/{id}")
     public ResponseEntity<?> updateOrderDetail(
             @Valid @PathVariable("id") Long id,
@@ -80,7 +79,6 @@ public class OrderDetailController {
         return ResponseEntity.ok().body(OrderDetailResponse.fromOrderDetail(updatedOrderDetail));
     }
 
-    // Cong viec cua admin
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteOrderDetail(@Valid @PathVariable("id") Long id)
     {

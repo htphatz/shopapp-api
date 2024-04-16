@@ -51,7 +51,6 @@ public class CategoryService implements ICategoryService {
     @Override
     @Transactional
     public void deleteCategory(long id) {
-        // Xoa xong
         categoryRepository.deleteById(id);
     }
 }

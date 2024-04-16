@@ -26,7 +26,7 @@ public class OrderService implements IOrderService {
     @Override
     public Order createOrder(OrderDTO orderDTO) throws Exception {
         // Tim xem user id ton tai khong
-        User user = userRepository
+        User existingUser = userRepository
                .findById(orderDTO.getUserId())
                .orElseThrow(() -> new DataNotFoundException("Cannot find user with id " + orderDTO.getUserId()));
         // Convert orderDTO -> order. Dung thu vien ModelMapper;
@@ -36,7 +36,7 @@ public class OrderService implements IOrderService {
                 .addMappings(mapper -> mapper.skip(Order::setId));
         Order order = new Order();
         modelMapper.map(orderDTO, order);
-        order.setUser(user);
+        order.setUser(existingUser);
         order.setOrderDate(new Date());
         order.setShippingMethod(OrderStatus.PENDING);
         // Kiem tra shippingDate
@@ -46,8 +46,7 @@ public class OrderService implements IOrderService {
         }
         order.setShippingDate(shippingDate);
         order.setActive(true);
-        orderRepository.save(order);
-        return order;
+        return orderRepository.save(order);
     }
 
     @Override

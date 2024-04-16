@@ -64,7 +64,7 @@ public class WebSecurityConfig {
                             .requestMatchers(HttpMethod.POST,
                                     String.format("%s/products/uploads/**", apiPrefix)).hasRole(Role.ADMIN)
                             .requestMatchers(HttpMethod.POST,
-                                    String.format("%s/products/**", apiPrefix)).hasRole(Role.ADMIN)
+                                    String.format("%s/products**", apiPrefix)).hasRole(Role.ADMIN)
                             .requestMatchers(HttpMethod.PUT,
                                     String.format("%s/products/**", apiPrefix)).hasRole(Role.ADMIN)
                             .requestMatchers(HttpMethod.DELETE,

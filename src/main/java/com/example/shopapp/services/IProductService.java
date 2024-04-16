@@ -17,5 +17,6 @@ public interface IProductService {
     Product updateProduct(long id, ProductDTO productDTO) throws DataNotFoundException;
     void deleteProduct(long id);
     boolean existsByName(String name);
+
     ProductImage createProductImage(long productId, ProductImageDTO productImageDTO) throws Exception;
 }
