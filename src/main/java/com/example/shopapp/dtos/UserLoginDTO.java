@@ -16,8 +16,4 @@ public class UserLoginDTO {
     
     @NotBlank(message = "Password cannot be blank")
     private String password;
-
-//    @JsonProperty("role_id")
-//    @NotBlank(message = "Role id cannot be blank")
-//    private Long roleId;
 }

@@ -1,7 +1,6 @@
 package com.example.shopapp.controllers;
 
 import com.example.shopapp.components.LocalizationUtils;
-import com.example.shopapp.dtos.OrderDTO;
 import com.example.shopapp.dtos.OrderDetailDTO;
 import com.example.shopapp.exceptions.DataNotFoundException;
 import com.example.shopapp.models.OrderDetail;
@@ -55,7 +54,6 @@ public class OrderDetailController {
         }
     }
 
-    // Lay ra danh sach order detail cua mot order nao do
     @GetMapping("/order/{order_id}")
     public ResponseEntity<?> getOrderDetails(@Valid @PathVariable("order_id") Long order_id)
     {

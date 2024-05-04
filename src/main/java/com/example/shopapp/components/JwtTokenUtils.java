@@ -43,9 +43,7 @@ public class JwtTokenUtils {
                     .compact();
             return token;
         } catch (Exception e) {
-            // You can inject Logger, instead System.err.println
             throw new InvalidParameterException("Cannot create jwt token, error: " + e.getMessage());
-            // return null;
         }
     }
 

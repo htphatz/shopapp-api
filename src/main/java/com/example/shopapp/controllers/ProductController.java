@@ -1,51 +1,34 @@
 package com.example.shopapp.controllers;
 
-import com.example.shopapp.dtos.CategoryDTO;
 import com.example.shopapp.dtos.ProductDTO;
-import com.example.shopapp.dtos.ProductImageDTO;
 import com.example.shopapp.exceptions.DataNotFoundException;
 import com.example.shopapp.models.Product;
-import com.example.shopapp.models.ProductImage;
 import com.example.shopapp.responses.ProductListResponse;
 import com.example.shopapp.responses.ProductResponse;
 import com.example.shopapp.services.CategoryService;
 import com.example.shopapp.services.CloudinaryService;
 import com.example.shopapp.services.ProductService;
 import com.github.javafaker.Faker;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("${api.prefix}/products")
 @RequiredArgsConstructor
 public class ProductController {
     private final ProductService productService;
-    private final CategoryService categoryService;
-    private final CloudinaryService cloudinaryService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> createProduct(
@@ -59,14 +42,6 @@ public class ProductController {
                         .map(FieldError::getDefaultMessage)
                         .toList();
                 return ResponseEntity.badRequest().body(errorMessages);
-            }
-            if (productDTO.getFileImage() == null) {
-                String imageUrl = "https://res.cloudinary.com/drgidfvnd/image/upload/v1713243712/no-image.1024x1024_gyl3zk.png";
-                productDTO.setImageUrl(imageUrl);
-            } else {
-                Map data = this.cloudinaryService.upload(productDTO.getFileImage());
-                String imageUrl = (String) data.get("secure_url");
-                productDTO.setImageUrl(imageUrl);
             }
             Product newProduct = productService.createProduct(productDTO);
             return ResponseEntity.ok(newProduct);
@@ -182,14 +157,6 @@ public class ProductController {
             @PathVariable("id") Long id,
             ProductDTO productDTO) {
         try {
-            if (productDTO.getFileImage() == null) {
-                String imageUrl = "https://res.cloudinary.com/drgidfvnd/image/upload/v1713243712/no-image.1024x1024_gyl3zk.png";
-                productDTO.setImageUrl(imageUrl);
-            } else {
-                Map data = this.cloudinaryService.upload(productDTO.getFileImage());
-                String imageUrl = (String) data.get("secure_url");
-                productDTO.setImageUrl(imageUrl);
-            }
             Product updatedProduct = productService.updateProduct(id, productDTO);
             return ResponseEntity.ok(updatedProduct);
         } catch (Exception e) {

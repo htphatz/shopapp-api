@@ -4,7 +4,6 @@ import com.example.shopapp.responses.ProductResponse;
 import com.example.shopapp.dtos.ProductDTO;
 import com.example.shopapp.dtos.ProductImageDTO;
 import com.example.shopapp.exceptions.DataNotFoundException;
-import com.example.shopapp.exceptions.InvalidParamException;
 import com.example.shopapp.models.Category;
 import com.example.shopapp.models.Product;
 import com.example.shopapp.models.ProductImage;
@@ -17,6 +16,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -25,6 +25,7 @@ public class ProductService implements IProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
     private final ProductImageRepository productImageRepository;
+    private final CloudinaryService cloudinaryService;
 
     @Override
     public Product createProduct(ProductDTO productDTO) throws DataNotFoundException {
@@ -34,10 +35,17 @@ public class ProductService implements IProductService {
         Product newProduct = Product.builder()
                 .name(productDTO.getName())
                 .price(productDTO.getPrice())
-                .imageUrl(productDTO.getImageUrl())
                 .description(productDTO.getDescription())
                 .category(existingCategory)
                 .build();
+        if (productDTO.getFileImage() == null) {
+            String imageUrl = "https://res.cloudinary.com/drgidfvnd/image/upload/v1713243712/no-image.1024x1024_gyl3zk.png";
+            newProduct.setImageUrl(imageUrl);
+        } else {
+            Map data = this.cloudinaryService.upload(productDTO.getFileImage());
+            String imageUrl = (String) data.get("secure_url");
+            newProduct.setImageUrl(imageUrl);
+        }
         return productRepository.save(newProduct);
     }
 
@@ -69,9 +77,16 @@ public class ProductService implements IProductService {
                     .orElseThrow(() -> new DataNotFoundException("Category with id " + productDTO.getCategoryId() + " not found"));
             existingProduct.setName(productDTO.getName());
             existingProduct.setPrice(productDTO.getPrice());
-            existingProduct.setImageUrl(productDTO.getImageUrl());
             existingProduct.setDescription(productDTO.getDescription());
             existingProduct.setCategory(existingCategory);
+            if (productDTO.getFileImage() == null) {
+                String imageUrl = "https://res.cloudinary.com/drgidfvnd/image/upload/v1713243712/no-image.1024x1024_gyl3zk.png";
+                existingProduct.setImageUrl(imageUrl);
+            } else {
+                Map data = this.cloudinaryService.upload(productDTO.getFileImage());
+                String imageUrl = (String) data.get("secure_url");
+                existingProduct.setImageUrl(imageUrl);
+            }
             return productRepository.save(existingProduct);
         }
         return null;
@@ -101,11 +116,6 @@ public class ProductService implements IProductService {
                 .product(existingProduct)
                 .imageUrl(productImageDTO.getImageUrl())
                 .build();
-        // Khong cho insert qua' 5 image cho 1 san pham
-//        int size = productImageRepository.findByProductId(productId).size();
-//        if (size >= 5) {
-//            throw new InvalidParamException("Number of image must be <= 5");
-//        }
         return productImageRepository.save(newProductImage);
     }
 }

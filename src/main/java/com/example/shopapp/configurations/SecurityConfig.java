@@ -1,6 +1,5 @@
 package com.example.shopapp.configurations;
 
-import com.example.shopapp.exceptions.DataNotFoundException;
 import com.example.shopapp.models.User;
 import com.example.shopapp.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final UserRepository userRepository;
-    // User's detail object
+
     @Bean
     public UserDetailsService userDetailsService() {
         return phoneNumber -> {

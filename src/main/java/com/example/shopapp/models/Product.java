@@ -3,9 +3,6 @@ package com.example.shopapp.models;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
 @Getter
 @Setter
 @AllArgsConstructor
@@ -23,7 +20,7 @@ public class Product extends BaseEntity {
 
     private Float price;
 
-    @Column(name = "image_url", length = 300)
+    @Column(name = "image_url")
     private String imageUrl;
 
     @Column(name = "description")

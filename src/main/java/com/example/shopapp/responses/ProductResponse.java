@@ -1,17 +1,8 @@
 package com.example.shopapp.responses;
 
-import com.example.shopapp.models.BaseEntity;
 import com.example.shopapp.models.Product;
-import com.example.shopapp.models.ProductImage;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Data // toString
 @Getter

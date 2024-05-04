@@ -1,10 +1,7 @@
 package com.example.shopapp.responses;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
 import lombok.*;
 
 import java.time.LocalDateTime;

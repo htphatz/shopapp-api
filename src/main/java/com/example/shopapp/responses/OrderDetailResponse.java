@@ -1,12 +1,7 @@
 package com.example.shopapp.responses;
 
-import com.example.shopapp.models.Order;
 import com.example.shopapp.models.OrderDetail;
-import com.example.shopapp.models.Product;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.Column;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import lombok.*;
 
 @Data // toString
