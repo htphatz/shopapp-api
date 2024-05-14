@@ -4,7 +4,7 @@ import com.example.shopapp.models.Product;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
-@Data // toString
+@Data
 @Getter
 @Setter
 @Builder

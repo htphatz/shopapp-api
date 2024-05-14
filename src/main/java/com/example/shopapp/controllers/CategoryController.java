@@ -5,10 +5,9 @@ import com.example.shopapp.dtos.CategoryDTO;
 import com.example.shopapp.exceptions.DataNotFoundException;
 import com.example.shopapp.models.Category;
 import com.example.shopapp.services.CategoryService;
-import com.example.shopapp.services.CloudinaryService;
 import com.example.shopapp.utils.MessageKeys;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -23,9 +22,9 @@ public class CategoryController {
     private final CategoryService categoryService;
     private final LocalizationUtils localizationUtils;
 
-    @PostMapping("")
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> createCategory(
-            @Valid @RequestBody CategoryDTO categoryDTO,
+            CategoryDTO categoryDTO,
             BindingResult result)
     {
         if (result.hasErrors()) {
@@ -52,7 +51,7 @@ public class CategoryController {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateCategory(
             @PathVariable Long id,
-            @RequestBody CategoryDTO categoryDTO) throws DataNotFoundException {
+            CategoryDTO categoryDTO) throws DataNotFoundException {
         categoryService.updateCategory(id, categoryDTO);
         return ResponseEntity.ok(localizationUtils.getLocalizedMessage(MessageKeys.UPDATE_CATEGORY_SUCCESSFULLY));
     }

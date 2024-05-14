@@ -38,7 +38,7 @@ public class OrderService implements IOrderService {
         modelMapper.map(orderDTO, order);
         order.setUser(existingUser);
         order.setOrderDate(new Date());
-        order.setShippingMethod(OrderStatus.PENDING);
+        order.setStatus(OrderStatus.PENDING);
         // Kiem tra shippingDate
         LocalDate shippingDate = (orderDTO.getShippingDate() == null) ? LocalDate.now() :orderDTO.getShippingDate() ;
         if (shippingDate.isBefore(LocalDate.now())) {
@@ -84,5 +84,10 @@ public class OrderService implements IOrderService {
     @Override
     public List<Order> findByUserId(long userId) {
         return orderRepository.findByUserId(userId);
+    }
+
+    @Override
+    public List<Order> findByUser(User user) {
+        return orderRepository.findByUser(user);
     }
 }

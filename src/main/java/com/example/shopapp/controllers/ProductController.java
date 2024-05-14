@@ -5,12 +5,9 @@ import com.example.shopapp.exceptions.DataNotFoundException;
 import com.example.shopapp.models.Product;
 import com.example.shopapp.responses.ProductListResponse;
 import com.example.shopapp.responses.ProductResponse;
-import com.example.shopapp.services.CategoryService;
-import com.example.shopapp.services.CloudinaryService;
 import com.example.shopapp.services.ProductService;
 import com.github.javafaker.Faker;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -20,8 +17,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 @RestController
@@ -116,41 +111,6 @@ public class ProductController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-
-    @GetMapping("/images/{imageName}")
-    public ResponseEntity<?> viewImage(@PathVariable String imageName) {
-        try {
-            Path imagePath = Paths.get("uploads/"+ imageName);
-            UrlResource resource = new UrlResource(imagePath.toUri());
-
-            if (resource.exists()) {
-                return ResponseEntity.ok()
-                        .contentType(MediaType.IMAGE_JPEG)
-                        .body(resource);
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-//    private String storeFile(MultipartFile file) throws IOException {
-//        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-//        // Them UUID vao truoc ten file de dam bao ten file la duy nhat
-//        String uniqueFilename = UUID.randomUUID().toString() + "_" + fileName;
-//        Path uploadDir = Paths.get("uploads");
-//        // Kiem tra va tao thu muc uploads neu chua ton tai
-//        if (!Files.exists(uploadDir)) {
-//            Files.createDirectories(uploadDir);
-//        }
-//        // Duong dan day du cua file
-//        Path destination = Paths.get(uploadDir.toString(), uniqueFilename);
-//        // Sao chep file vao thu muc dich
-//        Files.copy(file.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
-//        return uniqueFilename;
-//    }
-
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateProducts(

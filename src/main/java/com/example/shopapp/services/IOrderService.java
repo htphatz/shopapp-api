@@ -3,6 +3,7 @@ package com.example.shopapp.services;
 import com.example.shopapp.dtos.OrderDTO;
 import com.example.shopapp.exceptions.DataNotFoundException;
 import com.example.shopapp.models.Order;
+import com.example.shopapp.models.User;
 
 import java.util.List;
 
@@ -12,4 +13,5 @@ public interface IOrderService {
     Order updateOrder(long id, OrderDTO orderDTO) throws DataNotFoundException;
     void deleteOrder(long id);
     List<Order> findByUserId(long userId);
+    List<Order> findByUser(User user);
 }

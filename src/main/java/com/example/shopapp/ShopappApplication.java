@@ -11,9 +11,8 @@ import java.util.Map;
 
 @SpringBootApplication
 public class ShopappApplication {
-
 	public static void main(String[] args) {
-		SpringApplication.run(ShopappApplication.class, args);
+		SpringApplication.	run(ShopappApplication.class, args);
 	}
 
 	@Bean

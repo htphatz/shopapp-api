@@ -3,7 +3,7 @@ package com.example.shopapp.models;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Data
 @Getter
@@ -12,25 +12,22 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "token")
-public class Token {
+@Table(name = "refresh_tokens")
+public class RefreshToken {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "token", length = 255)
+    @Column(name = "token")
     private String token;
 
-    @Column(name = "token_type", length = 50)
-    private String tokenType;
-
     @Column(name = "expiration_date")
-    private LocalDateTime expirationDate;
+    private Instant expirationDate;
 
     private boolean revoked;
     private boolean expired;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
+    @OneToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 }
