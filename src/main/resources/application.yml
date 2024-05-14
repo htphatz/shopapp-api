@@ -37,3 +37,11 @@ payment:
     version: 2.1.0
     command: pay
     orderType: other
+open:
+  api:
+    title: API Documents
+    version: v1.0.0
+    description: Nothing special
+    serverUrl: http://localhost:8080/
+    serverName: Server test
+

@@ -96,6 +96,18 @@ public class WebSecurityConfig {
                                     String.format("%s/order-details/**", apiPrefix)).permitAll()
                             .requestMatchers(HttpMethod.DELETE,
                                     String.format("%s/order-details/**", apiPrefix)).permitAll()
+
+                            // Phan quyen Voucher
+                            .requestMatchers(HttpMethod.GET,
+                                    String.format("%s/vouchers**", apiPrefix)).permitAll()
+                            .requestMatchers(HttpMethod.GET,
+                                    String.format("%s/vouchers/**", apiPrefix)).permitAll()
+                            .requestMatchers(HttpMethod.POST,
+                                    String.format("%s/vouchers**", apiPrefix)).hasRole(Role.ADMIN)
+                            .requestMatchers(HttpMethod.PUT,
+                                    String.format("%s/vouchers/**", apiPrefix)).hasRole(Role.ADMIN)
+                            .requestMatchers(HttpMethod.DELETE,
+                                    String.format("%s/vouchers/**", apiPrefix)).hasRole(Role.ADMIN)
                             .anyRequest().authenticated();
                 })
                 .csrf(AbstractHttpConfigurer::disable);

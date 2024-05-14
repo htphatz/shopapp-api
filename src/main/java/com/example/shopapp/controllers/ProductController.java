@@ -77,7 +77,7 @@ public class ProductController {
 //        }
 //    }
 
-    @GetMapping("")
+    @GetMapping
     public ResponseEntity<ProductListResponse> getProducts(
             @RequestParam(defaultValue = "") String keyword,
             @RequestParam(defaultValue = "0", name = "category_id") Long categoryId,
