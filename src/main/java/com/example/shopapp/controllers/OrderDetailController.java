@@ -5,10 +5,11 @@ import com.example.shopapp.dtos.OrderDetailDTO;
 import com.example.shopapp.exceptions.DataNotFoundException;
 import com.example.shopapp.models.OrderDetail;
 import com.example.shopapp.responses.OrderDetailResponse;
+import com.example.shopapp.responses.ResponseCustom;
 import com.example.shopapp.services.OrderDetailService;
-import com.example.shopapp.utils.MessageKeys;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -34,12 +35,15 @@ public class OrderDetailController {
                         .stream()
                         .map(FieldError::getDefaultMessage)
                         .toList();
-                return ResponseEntity.badRequest().body(errorMessages);
+                return ResponseEntity.ok(new ResponseCustom(HttpStatus.BAD_REQUEST.value(),
+                        "Create order detail failed"));
             }
-            OrderDetail orderDetail = orderDetailService.createOrderDetail(orderDetailDTO);
-            return ResponseEntity.ok(OrderDetailResponse.fromOrderDetail(orderDetail));
+            OrderDetail newOrderDetail = orderDetailService.createOrderDetail(orderDetailDTO);
+            return ResponseEntity.ok(new ResponseCustom(HttpStatus.CREATED.value(),
+                    "Create order successfully", newOrderDetail));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.ok(new ResponseCustom(HttpStatus.BAD_REQUEST.value(),
+                    e.getMessage()));
         }
     }
 
@@ -73,14 +77,16 @@ public class OrderDetailController {
     public ResponseEntity<?> updateOrderDetail(
             @Valid @PathVariable("id") Long id,
             @Valid @RequestBody OrderDetailDTO orderDetailDTO) throws DataNotFoundException {
-        OrderDetail updatedOrderDetail = orderDetailService.updateOrderDetail(id, orderDetailDTO);
-        return ResponseEntity.ok().body(OrderDetailResponse.fromOrderDetail(updatedOrderDetail));
+        orderDetailService.updateOrderDetail(id, orderDetailDTO);
+        return ResponseEntity.ok(new ResponseCustom(HttpStatus.ACCEPTED.value(),
+                "Update order detail with id " + id + " successfully"));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteOrderDetail(@Valid @PathVariable("id") Long id)
     {
         orderDetailService.deleteById(id);
-        return ResponseEntity.ok().body(localizationUtils.getLocalizedMessage(MessageKeys.DELETE_ORDER_DETAIL_SUCCESSFULLY, id));
+        return ResponseEntity.ok(new ResponseCustom(HttpStatus.NO_CONTENT.value(),
+                "Delete order detail with id " + id + " successfully"));
     }
 }

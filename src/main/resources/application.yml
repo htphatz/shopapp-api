@@ -25,18 +25,9 @@ spring:
 api:
   prefix: api/v1
 jwt:
-  expiration: 3600 #1hour = 60 * 60
+  expiration: 86400 #24hours = 24 * 60 * 60
   secretKey: Z7hjrPTXlc9XLzJCO7kyYZWh1DiskWLbplYzgBHIREU=
   refresh-expiration: 604800 #7days = 7 * 24 * 60 * 60
-payment:
-  vnPay:
-    url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
-    tmnCode: 1BPJTK72
-    secretKey: 0LWX32MOPP4CJTA6H5FHRZDUEJ5VM1SP
-    returnUrl: http://localhost:8080/api/v1/payment/vn-pay-callback
-    version: 2.1.0
-    command: pay
-    orderType: other
 open:
   api:
     title: API Documents
@@ -44,4 +35,6 @@ open:
     description: Nothing special
     serverUrl: http://localhost:8080/
     serverName: Server test
+resource:
+  noImageUrl: "https://res.cloudinary.com/drgidfvnd/image/upload/v1713243712/no-image.1024x1024_gyl3zk.png"
 

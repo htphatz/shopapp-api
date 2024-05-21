@@ -7,7 +7,9 @@ import com.example.shopapp.dtos.UserLoginDTO;
 import com.example.shopapp.exceptions.RefreshTokenExpiredException;
 import com.example.shopapp.exceptions.RefreshTokenNotFoundException;
 import com.example.shopapp.models.RefreshToken;
+import com.example.shopapp.models.Role;
 import com.example.shopapp.models.User;
+import com.example.shopapp.repositories.UserRepository;
 import com.example.shopapp.responses.JwtResponse;
 import com.example.shopapp.responses.LoginResponse;
 import com.example.shopapp.responses.RegisterResponse;
@@ -17,6 +19,8 @@ import com.example.shopapp.components.LocalizationUtils;
 import com.example.shopapp.utils.MessageKeys;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -25,70 +29,112 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import static com.example.shopapp.constants.UserConstant.*;
 
 @RestController
 @RequestMapping("${api.prefix}/users")
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+    private final UserRepository userRepository;
     private final LocalizationUtils localizationUtils;
     private final JwtTokenUtils jwtTokenUtils;
     private final RefreshTokenService refreshTokenService;
 
     @PostMapping("/register")
-    public ResponseEntity<RegisterResponse> createUser(
-            @Valid @RequestBody UserDTO userDTO,
-            BindingResult result) {
+    public ResponseEntity<RegisterResponse> createUser(UserDTO userDto) {
+        User user = new User();
+        user.setRole(new Role(1L, Role.USER));
+        try {
+              user = userService.createUser(userDto);
+            return  ResponseEntity.ok( new RegisterResponse(SUCCESS, USER_CREATED_SUCCESS, user));
+        } catch (DataIntegrityViolationException e) {
+            return  ResponseEntity.status(HttpStatus.OK).body(new RegisterResponse(EMAIL_DUPLICATED_CODE, USER_DUPLICATED_EMAIL));
+        } catch (Exception e) {
+            return  ResponseEntity.internalServerError().body(new RegisterResponse("INTERNAL_SERVER_ERROR", e.getMessage()));
+        }
+    }
+//    @PostMapping("/register")
+//    public ResponseEntity<RegisterResponse> createUser(
+//            UserDTO userDTO,
+//            BindingResult result) {
+//        try {
+//            if (result.hasErrors()) {
+//                List<String> errorMessages = result.getFieldErrors()
+//                        .stream()
+//                        .map(FieldError::getDefaultMessage)
+//                        .toList();
+//                return ResponseEntity.badRequest().body(
+//                        RegisterResponse.builder()
+//                                .status(HttpStatus.BAD_REQUEST.value())
+//                                .message("Register failed")
+//                                .build()
+//                );
+//            }
+//            if(!userDTO.getPassword().equals(userDTO.getRetypePassword())) {
+//                return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body(RegisterResponse.builder()
+//                                .status(HttpStatus.BAD_REQUEST.value())
+//                                .message("Password not match")
+//                                .build());
+////                return ResponseEntity.badRequest().body(
+////                        RegisterResponse.builder()
+////                                .status(HttpStatus.UNAUTHORIZED.value())
+////                                .message("Password not match")
+////                                .build()
+////                );
+//            }
+//            User user = userService.createUser(userDTO);
+//            return ResponseEntity.ok(RegisterResponse.builder()
+//                            .status(HttpStatus.CREATED.value())
+//                            .message("Register successfully")
+//                            .user(user)
+//                    .build());
+//        }
+//        catch (DataIntegrityViolationException e) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(RegisterResponse.builder()
+//                    .status(HttpStatus.BAD_REQUEST.value())
+//                    .message("Email is already exists")
+//                    .build());
+//        }
+//        catch (Exception e) {
+//            return ResponseEntity.badRequest().body(
+//                    RegisterResponse.builder()
+//                            .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+//                            .message(e.getMessage())
+//                            .build()
+//            );
+//        }
+//    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(
+            UserLoginDTO userLoginDTO,
+            BindingResult result) throws Exception {
+        // Kiem tra thong tin dang nhap
+        // Tra ve thong tin dang nhap va sinh token
         try {
             if (result.hasErrors()) {
                 List<String> errorMessages = result.getFieldErrors()
                         .stream()
                         .map(FieldError::getDefaultMessage)
                         .toList();
-                return ResponseEntity.badRequest().body(
-                        RegisterResponse.builder()
-                                .message(localizationUtils.getLocalizedMessage(MessageKeys.REGISTER_FAILED, errorMessages))
-                                .build()
-                );
+                return ResponseEntity.badRequest().body(errorMessages);
             }
-            if(!userDTO.getPassword().equals(userDTO.getRetypePassword())) {
-                return ResponseEntity.badRequest().body(
-                        RegisterResponse.builder()
-                                .message(localizationUtils.getLocalizedMessage(MessageKeys.PASSWORD_NOT_MATCH))
-                                .build()
-                );
-            }
-            User user = userService.createUser(userDTO);
-            // return ResponseEntity.ok("Register successfully");
-            return ResponseEntity.ok(RegisterResponse.builder()
-                            .message(localizationUtils.getLocalizedMessage(MessageKeys.REGISTER_SUCCESSFULLY))
-                            .user(user)
-                    .build());
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(
-                    RegisterResponse.builder()
-                            .message(localizationUtils.getLocalizedMessage(MessageKeys.REGISTER_FAILED, e.getMessage()))
-                            .build()
-            );
-        }
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(
-            @Valid @RequestBody UserLoginDTO userLoginDTO) throws Exception {
-        // Kiem tra thong tin dang nhap
-        // Tra ve thong tin dang nhap va sinh token
-        try {
             String accessToken = userService.login(
-                    userLoginDTO.getPhone(),
+                    userLoginDTO.getEmail(),
                     userLoginDTO.getPassword()
             );
-            RefreshToken refreshToken = refreshTokenService.createRefreshToken(userLoginDTO.getPhone());
-            // Tra ve access-token va refresh-token trong response
+            RefreshToken refreshToken = refreshTokenService.createRefreshToken(userLoginDTO.getEmail());
+            List<User> users = new ArrayList<User>();
+            User user = userRepository.findByEmail(userLoginDTO.getEmail()).get();
+            // Tra ve message, access-token, refresh-token va thong tin user trong response
             return ResponseEntity.ok(LoginResponse.builder()
                             .message(localizationUtils.getLocalizedMessage(MessageKeys.LOGIN_SUCCESSFULLY))
                             .accessToken(accessToken)
+                            .user(user)
                             .refreshToken(refreshToken.getToken())
                     .build());
         } catch (Exception e) {

@@ -22,7 +22,7 @@ public class RefreshTokenService {
 
     public RefreshToken createRefreshToken(String phone) throws Exception {
         RefreshToken refreshToken =  RefreshToken.builder()
-                .user(userRepository.findByPhone(phone).get()) // Optional<User>
+                .user(userRepository.findByEmail(phone).get()) // Optional<User>
                 .token(UUID.randomUUID().toString())
                 .expirationDate(Instant.now().plusMillis(refreshExpiration * 1000L))
                 .revoked(false)

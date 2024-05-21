@@ -5,6 +5,7 @@ import com.example.shopapp.exceptions.DataNotFoundException;
 import com.example.shopapp.models.Category;
 import com.example.shopapp.repositories.CategoryRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,19 +18,21 @@ public class CategoryService implements ICategoryService {
     private final CategoryRepository categoryRepository;
     private final CloudinaryService cloudinaryService;
 
+    @Value("${resource.noImageUrl}")
+    private String noImageUrl;
+
     @Override
     public Category createCategory(CategoryDTO categoryDTO) {
         Category newCategory = Category.builder()
                 .name(categoryDTO.getName())
                 .build();
-        if (categoryDTO.getFileImage() == null) {
-            String imageUrl = "https://res.cloudinary.com/drgidfvnd/image/upload/v1713243712/no-image.1024x1024_gyl3zk.png";
-            newCategory.setImageUrl(imageUrl);
-        } else {
+        String imageUrl = noImageUrl;
+        // Nếu tồn tại file thì upload lên Cloudinary
+        if (categoryDTO.getFileImage() != null && !categoryDTO.getFileImage().isEmpty()) {
             Map data = this.cloudinaryService.upload(categoryDTO.getFileImage());
-            String imageUrl = (String) data.get("secure_url");
-            newCategory.setImageUrl(imageUrl);
+            imageUrl = (String) data.get("secure_url");
         }
+        newCategory.setImageUrl(imageUrl);
         return categoryRepository.save(newCategory);
     }
 
@@ -51,13 +54,11 @@ public class CategoryService implements ICategoryService {
                 .findById(id)
                 .orElseThrow(() -> new DataNotFoundException("Category with id " + id + " not found"));
         existingCategory.setName(categoryDTO.getName());
-        if (categoryDTO.getFileImage() == null) {
-            String imageUrl = "https://res.cloudinary.com/drgidfvnd/image/upload/v1713243712/no-image.1024x1024_gyl3zk.png";
-            existingCategory.setImageUrl(imageUrl);
-        } else {
+        existingCategory.setImageUrl(existingCategory.getImageUrl());
+        if (categoryDTO.getFileImage() != null && !categoryDTO.getFileImage().isEmpty()) {
             Map data = this.cloudinaryService.upload(categoryDTO.getFileImage());
-            String imageUrl = (String) data.get("secure_url");
-            existingCategory.setImageUrl(imageUrl);
+            String newImageUrl = (String) data.get("secure_url");
+            existingCategory.setImageUrl(newImageUrl);
         }
         categoryRepository.save(existingCategory);
         return existingCategory;

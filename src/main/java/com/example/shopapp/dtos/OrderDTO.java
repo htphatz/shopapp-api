@@ -8,12 +8,8 @@ import lombok.*;
 
 import java.time.LocalDate;
 
-@Data // toString
-@Builder
 @Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
+@Builder
 public class OrderDTO {
     @Min(value = 1, message = "User's ID must be > 0")
     @JsonProperty("user_id")

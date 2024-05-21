@@ -44,7 +44,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             final String authHeader = request.getHeader("Authorization");
             if (authHeader != null && authHeader.startsWith("Bearer ")) {
                 final String token = authHeader.substring(7);
-                final String phoneNumber = jwtTokenUtil.extractPhoneNumber(token);
+                final String phoneNumber = jwtTokenUtil.extractEmail(token);
                 if (phoneNumber != null &&
                         SecurityContextHolder.getContext().getAuthentication() == null) {
                     User userDetails = (User) userDetailsService.loadUserByUsername(phoneNumber);

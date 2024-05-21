@@ -48,6 +48,8 @@ public class WebSecurityConfig {
                             // Phan quyen Category
                             .requestMatchers(HttpMethod.GET,
                                     String.format("%s/categories**", apiPrefix)).permitAll()
+                            .requestMatchers(HttpMethod.GET,
+                                    String.format("%s/categories/**", apiPrefix)).permitAll()
                             .requestMatchers(HttpMethod.POST,
                                     String.format("%s/categories**", apiPrefix)).hasRole(Role.ADMIN)
                             .requestMatchers(HttpMethod.PUT,
@@ -108,6 +110,19 @@ public class WebSecurityConfig {
                                     String.format("%s/vouchers/**", apiPrefix)).hasRole(Role.ADMIN)
                             .requestMatchers(HttpMethod.DELETE,
                                     String.format("%s/vouchers/**", apiPrefix)).hasRole(Role.ADMIN)
+
+                            // Phan quyen Banner
+                            .requestMatchers(HttpMethod.GET,
+                                    String.format("%s/banners**", apiPrefix)).permitAll()
+                            .requestMatchers(HttpMethod.GET,
+                                    String.format("%s/banners/**", apiPrefix)).permitAll()
+                            .requestMatchers(HttpMethod.POST,
+                                    String.format("%s/banners**", apiPrefix)).hasRole(Role.ADMIN)
+                            .requestMatchers(HttpMethod.PUT,
+                                    String.format("%s/banners/**", apiPrefix)).hasRole(Role.ADMIN)
+                            .requestMatchers(HttpMethod.DELETE,
+                                    String.format("%s/banners/**", apiPrefix)).hasRole(Role.ADMIN)
+
                             .anyRequest().authenticated();
                 })
                 .csrf(AbstractHttpConfigurer::disable);

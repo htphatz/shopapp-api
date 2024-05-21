@@ -17,7 +17,7 @@ public class CloudinaryService {
         try{
             Map<?, ?> data = this.cloudinary.uploader().upload(file.getBytes(), Map.of());
             return data;
-        }catch (IOException io){
+        } catch (IOException io){
             throw new RuntimeException("Image upload fail");
         }
     }

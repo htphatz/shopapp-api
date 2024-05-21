@@ -5,10 +5,12 @@ import com.example.shopapp.dtos.OrderDTO;
 import com.example.shopapp.models.Order;
 import com.example.shopapp.models.User;
 import com.example.shopapp.repositories.UserRepository;
+import com.example.shopapp.responses.OrderListResponse;
+import com.example.shopapp.responses.ResponseCustom;
 import com.example.shopapp.services.OrderService;
-import com.example.shopapp.utils.MessageKeys;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -38,23 +40,29 @@ public class OrderController {
                         .stream()
                         .map(FieldError::getDefaultMessage)
                         .toList();
-                return ResponseEntity.badRequest().body(errorMessages);
+                return ResponseEntity.ok(new ResponseCustom(HttpStatus.BAD_REQUEST.value(),
+                        "Create order failed"));
             }
-            Order order = orderService.createOrder(orderDTO);
-            return ResponseEntity.ok(order);
+            Order newOrder = orderService.createOrder(orderDTO);
+            return ResponseEntity.ok(new ResponseCustom(HttpStatus.CREATED.value(),
+                    "Create order successfully", newOrder));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.ok(new ResponseCustom(HttpStatus.BAD_REQUEST.value(),
+                    e.getMessage()));
         }
     }
 
     @GetMapping("user/{user_id}")
-    public ResponseEntity<?> getOrdersByUserId(@Valid @PathVariable("user_id") Long userId)
+    public ResponseEntity<?> getOrdersByUserId(@Valid @PathVariable("user_id") Long id)
     {
         try {
-            List<Order> orders = orderService.findByUserId(userId);
-            return ResponseEntity.ok(orders);
+            List<Order> orders = orderService.findByUserId(id);
+            return ResponseEntity.ok(OrderListResponse.builder()
+                    .orders(orders)
+                    .build());
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.ok(new ResponseCustom(HttpStatus.BAD_REQUEST.value(),
+                    "Cannot get orders with user id " + id));
         }
     }
 
@@ -64,7 +72,7 @@ public class OrderController {
         try {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             String currentUsername = authentication.getName();
-            Optional<User> optionalUser = userRepository.findByPhone(currentUsername);
+            Optional<User> optionalUser = userRepository.findByEmail(currentUsername);
             if (optionalUser.isEmpty()) {
                 return ResponseEntity.badRequest().body("Cannot find user with phone: " + currentUsername);
             } else {
@@ -82,9 +90,12 @@ public class OrderController {
     {
         try {
             Order existingOrder = orderService.getOrderById(id);
-            return ResponseEntity.ok(existingOrder);
+            return ResponseEntity.ok(new ResponseCustom(HttpStatus.OK.value(),
+                    "Get order with id " + id + " successfully",
+                    existingOrder));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.ok(new ResponseCustom(HttpStatus.BAD_REQUEST.value(),
+                    "Cannot get order with id " + id));
         }
     }
 
@@ -94,10 +105,12 @@ public class OrderController {
             @Valid @RequestBody OrderDTO orderDTO)
     {
         try {
-            Order order = orderService.updateOrder(id, orderDTO);
-            return ResponseEntity.ok(order);
+            orderService.updateOrder(id, orderDTO);
+            return ResponseEntity.ok(new ResponseCustom(HttpStatus.ACCEPTED.value(),
+                    "Update order with id " + id + " successfully"));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.ok(new ResponseCustom(HttpStatus.BAD_REQUEST.value(),
+                    "Cannot update order with id " + id));
         }
     }
 
@@ -106,6 +119,7 @@ public class OrderController {
     {
         // Xoa mem => cap nhat active = 0
         orderService.deleteOrder(id);
-        return ResponseEntity.ok().body(localizationUtils.getLocalizedMessage(MessageKeys.DELETE_ORDER_SUCCESSFULLY, id));
+        return ResponseEntity.ok(new ResponseCustom(HttpStatus.NO_CONTENT.value(),
+                "Delete order with id " + id + " successfully"));
     }
 }

@@ -33,11 +33,11 @@ public class JwtTokenUtils {
         // Properties => Claims
         Map<String, Object> claims = new HashMap<>();
         // this.generateSecretKey();
-        claims.put("phone", user.getPhone());
+        claims.put("email", user.getEmail());
         try {
             String token = Jwts.builder()
                     .setClaims(claims)
-                    .setSubject(user.getPhone())
+                    .setSubject(user.getEmail())
                     .setExpiration(new Date(System.currentTimeMillis() + expiration * 1000L))
                     .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                     .compact();
@@ -78,13 +78,13 @@ public class JwtTokenUtils {
         return expirationDate.before(new Date());
     }
 
-    public String extractPhoneNumber(String token) {
+    public String extractEmail(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
     public boolean validateToken(String token, UserDetails userDetails) {
-        String phoneNumber = extractPhoneNumber(token);
-        return (phoneNumber.equals(userDetails.getUsername()))
+        String email = extractEmail(token);
+        return (email.equals(userDetails.getUsername()))
                 && !isTokenExpired(token);
     }
 }

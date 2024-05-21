@@ -1,19 +1,23 @@
 package com.example.shopapp.responses;
 
 import com.example.shopapp.models.User;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
-@Data // toString
 @Getter
-@Setter
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor
 public class RegisterResponse {
-    @JsonProperty("message")
+    // SUCCESS | EMAIL_DUPLICATED
+    private String status;
+
     private String message;
 
-    @JsonProperty("user")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private User user;
+
+    public RegisterResponse(String status, String message) {
+        this.status = status;
+        this.message = message;
+    }
 }

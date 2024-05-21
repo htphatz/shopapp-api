@@ -6,8 +6,6 @@ import lombok.*;
 import java.time.Instant;
 
 @Data
-@Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder

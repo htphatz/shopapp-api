@@ -1,18 +1,13 @@
 package com.example.shopapp.dtos;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
-@Data // toString
 @Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
+@Builder
 public class UserLoginDTO {
-    @JsonProperty("phone")
-    @NotBlank(message = "Phone number is required")
-    private String phone;
+    @NotBlank(message = "Email number is required")
+    private String email;
     
     @NotBlank(message = "Password cannot be blank")
     private String password;

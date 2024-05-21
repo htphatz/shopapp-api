@@ -1,14 +1,9 @@
 package com.example.shopapp.dtos;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Getter
+@Builder
 public class RefreshTokenRequest {
-    @JsonProperty("token")
     private String token;
 }

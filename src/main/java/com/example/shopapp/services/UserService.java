@@ -8,7 +8,10 @@ import com.example.shopapp.models.Role;
 import com.example.shopapp.models.User;
 import com.example.shopapp.repositories.RoleRepository;
 import com.example.shopapp.repositories.UserRepository;
+import lombok.Data;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -18,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+@Data
 @Service
 @RequiredArgsConstructor
 public class UserService implements IUserService {
@@ -29,10 +33,10 @@ public class UserService implements IUserService {
     @Override
     // Register
     public User createUser(UserDTO userDTO) throws Exception {
-        String phone = userDTO.getPhone();
-        // Kiem tra so dien thoai da dang ky chua
-        if (userRepository.existsByPhone(phone)) {
-            throw new DataIntegrityViolationException("Phone number already exist");
+        String email = userDTO.getEmail();
+        // Kiem tra email da dang ky chua
+        if (userRepository.existsByEmail(email)) {
+            throw new DataIntegrityViolationException("Email already exist");
         }
         Role existingRole = roleRepository.findById(userDTO.getRoleId())
                 .orElseThrow(() -> new DataNotFoundException("Role not found"));
@@ -43,48 +47,41 @@ public class UserService implements IUserService {
         User newUser = User.builder()
                 .firstName(userDTO.getFirstName())
                 .lastName(userDTO.getLastName())
-                .phone(userDTO.getPhone())
+                .email(userDTO.getEmail())
                 .password(userDTO.getPassword())
-                .address((userDTO.getAddress()))
-                .dateOfBirth(userDTO.getDateOfBirth())
-                .facebookAccountId(userDTO.getFacebookAccountId())
-                .googleAccountId(userDTO.getGoogleAccountId())
                 .build();
         newUser.setRole(existingRole);
         newUser.setActive(true);
         // Kiem tra neu co accountID, khong yeu cau password
-        if (userDTO.getFacebookAccountId() == 0 && userDTO.getGoogleAccountId() == 0) {
-            String password = userDTO.getPassword();
-            String encodedPassword = passwordEncoder.encode(password);
-            newUser.setPassword(encodedPassword);
-        }
+        String password = userDTO.getPassword();
+        String encodedPassword = passwordEncoder.encode(password);
+        newUser.setPassword(encodedPassword);
         return userRepository.save(newUser);
     }
 
     @Override
-    public String login(String phone, String password) throws Exception {
-        Optional<User> optionalUser = userRepository.findByPhone(phone);
+    public String login(String email, String password) throws Exception {
+        Optional<User> optionalUser = userRepository.findByEmail(email);
         if (optionalUser.isEmpty()) {
-            throw new DataNotFoundException("Invalid phone number / password");
+            throw new DataNotFoundException("Invalid Email or Password");
         }
         // return optionalUser.get(); tra JWT token
         User existingUser = optionalUser.get();
         // Check password
-        if (existingUser.getFacebookAccountId() == 0 && existingUser.getGoogleAccountId() == 0) {
-            if (!passwordEncoder.matches(password, existingUser.getPassword())) {
-                throw new BadCredentialsException("Wrong phone number or password");
-            }
+        if (!passwordEncoder.matches(password, existingUser.getPassword())) {
+            throw new BadCredentialsException("Wrong Email or Password");
         }
 //        Optional<Role> optionalRole = roleRepository.findById(roleId);
 //        if (optionalRole.isEmpty() || !roleId.equals(existingUser.getRole().getId())) {
 //            throw new DataNotFoundException("Role does not exist");
 //        }
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                phone, password,
+                email, password,
                 existingUser.getAuthorities()
         );
         // Authenticate with Java Spring security
         authenticationManager.authenticate(authenticationToken);
         return jwtTokenUtil.generateToken(existingUser);
     }
+
 }

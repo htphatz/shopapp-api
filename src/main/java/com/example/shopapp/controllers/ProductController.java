@@ -3,20 +3,18 @@ package com.example.shopapp.controllers;
 import com.example.shopapp.dtos.ProductDTO;
 import com.example.shopapp.exceptions.DataNotFoundException;
 import com.example.shopapp.models.Product;
-import com.example.shopapp.responses.ProductListResponse;
-import com.example.shopapp.responses.ProductResponse;
+import com.example.shopapp.responses.ResponseCustom;
 import com.example.shopapp.services.ProductService;
 import com.github.javafaker.Faker;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -26,7 +24,7 @@ public class ProductController {
     private final ProductService productService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> createProduct(
+    public ResponseCustom<?> createProduct(
             ProductDTO productDTO,
             BindingResult result)
     {
@@ -36,102 +34,53 @@ public class ProductController {
                         .stream()
                         .map(FieldError::getDefaultMessage)
                         .toList();
-                return ResponseEntity.badRequest().body(errorMessages);
+                return new ResponseCustom<>(HttpStatus.BAD_REQUEST.value(), "Create product failed");
             }
             Product newProduct = productService.createProduct(productDTO);
-            return ResponseEntity.ok(newProduct);
+            List<Product> products = new ArrayList<Product>();
+            products.add(newProduct);
+            return new ResponseCustom<>(HttpStatus.CREATED.value(), "Create category successfully", products);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return new ResponseCustom<>(HttpStatus.BAD_REQUEST.value(), e.getMessage());
         }
     }
 
-//    @PostMapping(value = "uploads/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-//    public ResponseEntity<?> uploadImages(
-//            @PathVariable("id") long productId,
-//            @ModelAttribute("file") MultipartFile file) {
-//        try {
-//            Product existingProduct = productService.getProductById(productId);
-//                if (file.getSize() == 0)
-//                    return ResponseEntity.status(HttpStatus.NOT_FOUND)
-//                            .body("File not found");
-//                if (file.getSize() > 10 * 1024 * 1024) { // Kich thuoc hon 10MB
-//                    return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE)
-//                            .body("File is too large, Maximum size is 10MB");
-//                }
-//                String contentType = file.getContentType();
-//                if (contentType == null || !contentType.startsWith("image/")) {
-//                    return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
-//                            .body("File must be an image");
-//                }
-//                // Luu file va cap nhat thumbnail
-//                String filename = storeFile(file);
-//                // Luu vao bang products
-//                ProductImage productImage =  productService.createProductImage(existingProduct.getId(),
-//                        ProductImageDTO.builder()
-//                        .imageUrl(filename)
-//                        .build()
-//                );
-//            return ResponseEntity.ok().body(productImage);
-//        } catch (Exception e) {
-//            return ResponseEntity.badRequest().body(e.getMessage());
-//        }
-//    }
-
     @GetMapping
-    public ResponseEntity<ProductListResponse> getProducts(
+    public ResponseCustom<List<Product>> getProducts(
             @RequestParam(defaultValue = "") String keyword,
-            @RequestParam(defaultValue = "0", name = "category_id") Long categoryId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "12") int limit
+            @RequestParam(defaultValue = "0", name = "category_id") Long categoryId
     ) {
-        // Tao Pageable tu thong tin trang va gioi han
-        PageRequest pageRequest = PageRequest.of(
-                page, limit,
-                Sort.by(("id")).ascending()
-                // Sort.by("createdAt").descending()
-        );
-        Page<ProductResponse> productPage = productService.getAllProducts(keyword, categoryId, pageRequest);
 
-        // Lay tong so trang
-        int totalPages = productPage.getTotalPages();
-
-        List<ProductResponse> products = productPage.getContent();
-        return ResponseEntity.ok(ProductListResponse.builder()
-                .products(products)
-                .totalPages(totalPages)
-                .build());
+        List<Product> products = productService.getAllProducts(keyword, categoryId);
+        return new ResponseCustom<>(HttpStatus.OK.value(), "Get all products successfully", products);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getProductById(@PathVariable("id") long productId) throws DataNotFoundException {
+    public ResponseCustom<?> getProductById(@PathVariable("id") long id) throws DataNotFoundException {
         try {
-            Product existingProduct = productService.getProductById(productId);
-            return ResponseEntity.ok(ProductResponse.fromProduct(existingProduct));
+            Product existingProduct = productService.getProductById(id);
+            return new ResponseCustom<>(HttpStatus.OK.value(), "Get product with id " + id + " successfully", existingProduct);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return new ResponseCustom<>(HttpStatus.BAD_REQUEST.value(), "Cannot get product with id " + id);
         }
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateProducts(
+    public ResponseCustom<?> updateProducts(
             @PathVariable("id") Long id,
             ProductDTO productDTO) {
         try {
-            Product updatedProduct = productService.updateProduct(id, productDTO);
-            return ResponseEntity.ok(updatedProduct);
+            productService.updateProduct(id, productDTO);
+            return new ResponseCustom<>(HttpStatus.ACCEPTED.value(), "Update product with id " + id + " successfully");
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return new ResponseCustom<>(HttpStatus.BAD_REQUEST.value(), "Cannot update product with id " + id);
         }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteProduct(@PathVariable("id") Long id) {
-        try {
-            productService.deleteProduct(id);
-            return ResponseEntity.ok("Product with id " + id + " deleted successfully");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseCustom<?> deleteProduct(@PathVariable("id") Long id) {
+        productService.deleteProduct(id);
+        return new ResponseCustom<>(HttpStatus.NO_CONTENT.value(), "Delete product with id " + id + " successfully");
     }
 
     @PostMapping("/generateFakeProducts")

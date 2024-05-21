@@ -4,12 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Min;
 import lombok.*;
 
-@Data // toString
-@Builder
 @Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
+@Builder
 public class OrderDetailDTO {
     @Min(value = 1, message = "Order's ID must be >= 1")
     @JsonProperty("order_id")

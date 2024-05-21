@@ -11,11 +11,13 @@ import com.example.shopapp.repositories.CategoryRepository;
 import com.example.shopapp.repositories.ProductImageRepository;
 import com.example.shopapp.repositories.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -26,6 +28,9 @@ public class ProductService implements IProductService {
     private final CategoryRepository categoryRepository;
     private final ProductImageRepository productImageRepository;
     private final CloudinaryService cloudinaryService;
+
+    @Value("${resource.noImageUrl}")
+    private String noImageUrl;
 
     @Override
     public Product createProduct(ProductDTO productDTO) throws DataNotFoundException {
@@ -38,14 +43,13 @@ public class ProductService implements IProductService {
                 .description(productDTO.getDescription())
                 .category(existingCategory)
                 .build();
-        if (productDTO.getFileImage() == null) {
-            String imageUrl = "https://res.cloudinary.com/drgidfvnd/image/upload/v1713243712/no-image.1024x1024_gyl3zk.png";
-            newProduct.setImageUrl(imageUrl);
-        } else {
+        String imageUrl = noImageUrl;
+        // Nếu tồn tại file thì upload lên Cloudinary
+        if (productDTO.getFileImage() != null && !productDTO.getFileImage().isEmpty()) {
             Map data = this.cloudinaryService.upload(productDTO.getFileImage());
-            String imageUrl = (String) data.get("secure_url");
-            newProduct.setImageUrl(imageUrl);
+            imageUrl = (String) data.get("secure_url");
         }
+        newProduct.setImageUrl(imageUrl);
         return productRepository.save(newProduct);
     }
 
@@ -56,13 +60,8 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public Page<ProductResponse> getAllProducts(String keyword,
-                                                Long categoryId,
-                                                PageRequest pageRequest) {
-        // Lay danh sach san pham theo page,limit hoac caterotyId (neu co)
-        Page<Product> productsPage;
-        productsPage = productRepository.searchProducts(categoryId, keyword, pageRequest);
-        return productsPage.map(ProductResponse::fromProduct);
+    public List<Product> getAllProducts(String keyword, Long categoryId) {
+        return productRepository.searchProducts(categoryId, keyword);
     }
 
     @Override
@@ -79,13 +78,11 @@ public class ProductService implements IProductService {
             existingProduct.setPrice(productDTO.getPrice());
             existingProduct.setDescription(productDTO.getDescription());
             existingProduct.setCategory(existingCategory);
-            if (productDTO.getFileImage() == null) {
-                String imageUrl = "https://res.cloudinary.com/drgidfvnd/image/upload/v1713243712/no-image.1024x1024_gyl3zk.png";
-                existingProduct.setImageUrl(imageUrl);
-            } else {
+            existingProduct.setImageUrl(existingProduct.getImageUrl());
+            if (productDTO.getFileImage() != null && !productDTO.getFileImage().isEmpty()) {
                 Map data = this.cloudinaryService.upload(productDTO.getFileImage());
-                String imageUrl = (String) data.get("secure_url");
-                existingProduct.setImageUrl(imageUrl);
+                String newImageUrl = (String) data.get("secure_url");
+                existingProduct.setImageUrl(newImageUrl);
             }
             return productRepository.save(existingProduct);
         }
