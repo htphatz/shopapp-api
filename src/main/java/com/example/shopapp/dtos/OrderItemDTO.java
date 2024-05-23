@@ -5,6 +5,8 @@ import jakarta.validation.constraints.Min;
 import lombok.*;
 
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class OrderDetailDTO {
     @Min(value = 1, message = "Order's ID must be >= 1")
@@ -16,15 +18,12 @@ public class OrderDetailDTO {
     private Long productId;
 
     @Min(value = 0, message = "Price must be >= 0")
-    private Float price;
+    private Double price;
 
     @Min(value = 1, message = "Number of products must be >= 1")
-    @JsonProperty("number_of_products")
-    private int numberOfProducts;
+    private int quantity;
 
     @Min(value = 0, message = "Total money must be >= 0")
     @JsonProperty("total_money")
-    private Float totalMoney;
-
-    private String color;
+    private Double totalMoney;
 }

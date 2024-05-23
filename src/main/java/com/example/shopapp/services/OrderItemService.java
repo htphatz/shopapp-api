@@ -27,16 +27,13 @@ public class OrderDetailService implements IOrderDetailService {
                 .orElseThrow(() -> new DataNotFoundException("Cannot find order with id " + orderDetailDTO.getOrderId()));
         Product existingProduct = productRepository.findById(orderDetailDTO.getProductId())
                 .orElseThrow(() -> new DataNotFoundException("Cannot find product with id " + orderDetailDTO.getProductId()));
-        OrderDetail orderDetail = OrderDetail.builder()
+        OrderDetail newOrderDetail = OrderDetail.builder()
                 .order(existingOrder)
                 .product(existingProduct)
                 .price(orderDetailDTO.getPrice())
-                .numberOfProducts(orderDetailDTO.getNumberOfProducts())
-                .totalMoney(orderDetailDTO.getTotalMoney())
-                .color(orderDetailDTO.getColor())
+                .quantity(orderDetailDTO.getQuantity())
                 .build();
-        orderDetailRepository.save(orderDetail);
-        return orderDetail;
+        return orderDetailRepository.save(newOrderDetail);
     }
 
     @Override
@@ -48,7 +45,6 @@ public class OrderDetailService implements IOrderDetailService {
     @Override
     @Transactional
     public OrderDetail updateOrderDetail(long id, OrderDetailDTO orderDetailDTO) throws DataNotFoundException {
-        // Tim xem order detail co ton tai khong
         OrderDetail existingOrderDetail = orderDetailRepository.findById(id)
                 .orElseThrow(() -> new DataNotFoundException("Cannot find OrderDetail with id" + id));
         Order existingOrder = orderRepository.findById(orderDetailDTO.getOrderId())
@@ -59,9 +55,8 @@ public class OrderDetailService implements IOrderDetailService {
         existingOrderDetail.setProduct(existingProduct);
         existingOrderDetail.setPrice(orderDetailDTO.getPrice());
         existingOrderDetail.setTotalMoney(orderDetailDTO.getTotalMoney());
-        existingOrderDetail.setNumberOfProducts(orderDetailDTO.getNumberOfProducts());
-        orderDetailRepository.save(existingOrderDetail);
-        return existingOrderDetail;
+        existingOrderDetail.setQuantity(orderDetailDTO.getQuantity());
+        return orderDetailRepository.save(existingOrderDetail);
     }
 
     @Override

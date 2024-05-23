@@ -23,14 +23,11 @@ public class OrderDetail {
     private Product product;
 
     @Column(name = "price", nullable = false)
-    private Float price;
+    private Double price;
 
-    @Column(name = "number_of_products")
-    private int numberOfProducts;
+    @Column(name = "quantity")
+    private int quantity;
 
     @Column(name = "total_money", nullable = false)
-    private Float totalMoney;
-
-    @Column(name = "color", length = 20)
-    private String color;
+    private Double totalMoney;
 }
