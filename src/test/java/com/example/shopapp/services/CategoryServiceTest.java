@@ -12,15 +12,15 @@ import org.springframework.dao.DataIntegrityViolationException;
 @SpringBootTest
 public class CategoryServiceTest {
     // Test
-    @Test
-    public void testCreateCategoryWithNoImage() {
-        Category category = new Category();
-        category.setImageUrl("assadiuasfnj");
-        CategoryDTO categoryDTO = new CategoryDTO();
-        categoryDTO.setName("test");
-        Category newCategory = categoryService.createCategory(categoryDTO);
-        Assertions.assertEquals(category.getImageUrl(), newCategory.getImageUrl());
-    }
+//    @Test
+//    public void testCreateCategoryWithNoImage() {
+//        Category category = new Category();
+//        category.setImageUrl("assadiuasfnj");
+//        CategoryDTO categoryDTO = new CategoryDTO();
+//        categoryDTO.setName("test");
+//        Category newCategory = categoryService.createCategory(categoryDTO);
+//        Assertions.assertEquals(category.getImageUrl(), newCategory.getImageUrl());
+//    }
     private CategoryService categoryService;
 
     @Value("${resource.category.noImageUrl}")

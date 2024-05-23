@@ -1,6 +1,6 @@
 package com.example.shopapp.responses;
 
-import com.example.shopapp.models.OrderDetail;
+import com.example.shopapp.models.OrderItem;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
@@ -17,25 +17,22 @@ public class OrderDetailResponse {
     @JsonProperty("product_id")
     private Long productId;
 
-    private Float price;
+    private Double price;
 
     @JsonProperty("number_of_products")
     private int numberOfProducts;
 
     @JsonProperty("total_money")
-    private Float totalMoney;
+    private Double totalMoney;
 
-    private String color;
-
-    public static OrderDetailResponse fromOrderDetail(OrderDetail orderDetail) {
+    public static OrderDetailResponse fromOrderDetail(OrderItem orderItem) {
         return OrderDetailResponse.builder()
-                .id(orderDetail.getId())
-                .orderId(orderDetail.getOrder().getId())
-                .productId(orderDetail.getProduct().getId())
-                .price(orderDetail.getPrice())
-                .numberOfProducts(orderDetail.getNumberOfProducts())
-                .totalMoney(orderDetail.getTotalMoney())
-                .color(orderDetail.getColor())
+                .id(orderItem.getId())
+                .orderId(orderItem.getOrder().getId())
+                .productId(orderItem.getProduct().getId())
+                .price(orderItem.getPrice())
+                .numberOfProducts(orderItem.getQuantity())
+                .totalMoney(orderItem.getTotalMoney())
                 .build();
     }
 }

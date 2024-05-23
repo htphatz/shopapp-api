@@ -9,7 +9,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class JwtResponse {
+public class RefreshTokenResponse {
     @JsonProperty("access_token")
     private String accessToken;
 

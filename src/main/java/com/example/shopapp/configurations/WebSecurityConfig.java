@@ -1,5 +1,6 @@
 package com.example.shopapp.configurations;
 
+import static org.springframework.http.HttpMethod.* ;
 import com.example.shopapp.filters.JwtTokenFilter;
 import com.example.shopapp.models.Role;
 import lombok.RequiredArgsConstructor;
@@ -25,9 +26,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WebSecurityConfig {
     private final JwtTokenFilter jwtTokenFilter;
-
+    private static final String[] PUBLIC_POST_PATTERNS ={"/api/v1/users/login", "/api/v1/users/register"};
+    private static final String[] AUTHENTICATED_GET_PATTERNS={"/api/v1/users/me"};
     @Value("${api.prefix}")
     private String apiPrefix;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
@@ -36,14 +39,16 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(requests -> {
                     requests
                             .requestMatchers(
-                                    String.format("%s/users/register", apiPrefix),
+                                    "%s/users/register".formatted(apiPrefix),
                                     String.format("%s/users/login", apiPrefix),
                                     String.format("%s/users/refreshToken", apiPrefix)
                             ).permitAll()
 
+                            // Phan quyen xem thong tin sau khi dang nhap
+                            .requestMatchers(GET, String.format("%s/users/me", apiPrefix)).authenticated()
+
                             // Phan quyen Role
-                            .requestMatchers(HttpMethod.GET,
-                                    String.format("%s/roles**", apiPrefix)).permitAll()
+                            .requestMatchers(GET, String.format("%s/roles**", apiPrefix)).permitAll()
 
                             // Phan quyen Category
                             .requestMatchers(HttpMethod.GET,
@@ -74,6 +79,8 @@ public class WebSecurityConfig {
                                     String.format("%s/orders/**", apiPrefix)).permitAll()
                             .requestMatchers(HttpMethod.GET,
                                     String.format("%s/orders/user/**", apiPrefix)).permitAll()
+                            .requestMatchers(HttpMethod.GET,
+                                    String.format("%s/orders/me", apiPrefix)).authenticated()
                             .requestMatchers(HttpMethod.POST,
                                     String.format("%s/orders**", apiPrefix)).permitAll()
                             .requestMatchers(HttpMethod.PUT,
@@ -122,7 +129,9 @@ public class WebSecurityConfig {
                                     String.format("%s/banners/**", apiPrefix)).hasRole(Role.ADMIN)
                             .requestMatchers(HttpMethod.DELETE,
                                     String.format("%s/banners/**", apiPrefix)).hasRole(Role.ADMIN)
-
+                            .requestMatchers(POST, PUBLIC_POST_PATTERNS).permitAll()
+//                            .requestMatchers(GET, PUBLIC_GET_PATTERNS).permitAll()
+//                            .requestMatchers(GET, AUTHENTICATED_GET_PATTERNS).authenticated()
                             .anyRequest().authenticated();
                 })
                 .csrf(AbstractHttpConfigurer::disable);

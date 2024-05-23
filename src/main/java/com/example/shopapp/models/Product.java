@@ -17,7 +17,7 @@ public class Product extends BaseEntity {
     @Column(name = "name", nullable = false, length = 350)
     private String name;
 
-    private Float price;
+    private Double price;
 
     @Column(name = "image_url")
     private String imageUrl;

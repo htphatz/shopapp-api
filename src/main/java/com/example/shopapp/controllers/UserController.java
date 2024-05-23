@@ -10,7 +10,7 @@ import com.example.shopapp.models.RefreshToken;
 import com.example.shopapp.models.Role;
 import com.example.shopapp.models.User;
 import com.example.shopapp.repositories.UserRepository;
-import com.example.shopapp.responses.JwtResponse;
+import com.example.shopapp.responses.RefreshTokenResponse;
 import com.example.shopapp.responses.LoginResponse;
 import com.example.shopapp.responses.RegisterResponse;
 import com.example.shopapp.services.RefreshTokenService;
@@ -22,14 +22,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.shopapp.constants.UserConstant.*;
@@ -45,12 +46,12 @@ public class UserController {
     private final RefreshTokenService refreshTokenService;
 
     @PostMapping("/register")
-    public ResponseEntity<RegisterResponse> createUser(UserDTO userDto) {
+    public ResponseEntity<RegisterResponse> createUser(UserDTO userDTO) {
         User user = new User();
         user.setRole(new Role(1L, Role.USER));
         try {
-              user = userService.createUser(userDto);
-            return  ResponseEntity.ok( new RegisterResponse(SUCCESS, USER_CREATED_SUCCESS, user));
+            user = userService.createUser(userDTO);
+            return  ResponseEntity.ok(new RegisterResponse(SUCCESS, USER_CREATED_SUCCESS));
         } catch (DataIntegrityViolationException e) {
             return  ResponseEntity.status(HttpStatus.OK).body(new RegisterResponse(EMAIL_DUPLICATED_CODE, USER_DUPLICATED_EMAIL));
         } catch (Exception e) {
@@ -128,13 +129,10 @@ public class UserController {
                     userLoginDTO.getPassword()
             );
             RefreshToken refreshToken = refreshTokenService.createRefreshToken(userLoginDTO.getEmail());
-            List<User> users = new ArrayList<User>();
-            User user = userRepository.findByEmail(userLoginDTO.getEmail()).get();
             // Tra ve message, access-token, refresh-token va thong tin user trong response
             return ResponseEntity.ok(LoginResponse.builder()
                             .message(localizationUtils.getLocalizedMessage(MessageKeys.LOGIN_SUCCESSFULLY))
                             .accessToken(accessToken)
-                            .user(user)
                             .refreshToken(refreshToken.getToken())
                     .build());
         } catch (Exception e) {
@@ -146,7 +144,7 @@ public class UserController {
     }
 
     @PostMapping("/refreshToken")
-    public ResponseEntity<?> refreshToken(@Valid @RequestBody RefreshTokenRequest
+    public ResponseEntity<?> refreshToken(@Valid RefreshTokenRequest
                                                       refreshTokenRequest) throws Exception {
         try {
             RefreshToken refreshToken = refreshTokenService.findByToken(refreshTokenRequest.getToken())
@@ -158,7 +156,7 @@ public class UserController {
             }
             User user = refreshToken.getUser();
             String accessToken = jwtTokenUtils.generateToken(user);
-            return ResponseEntity.ok(JwtResponse.builder()
+            return ResponseEntity.ok(RefreshTokenResponse.builder()
                     .accessToken(accessToken)
                     .refreshToken(refreshToken.getToken())
                     .build());
@@ -166,4 +164,11 @@ public class UserController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> getInformation() throws Exception {
+        UsernamePasswordAuthenticationToken auth = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        return ResponseEntity.ok(auth.getPrincipal());
+    }
+
 }

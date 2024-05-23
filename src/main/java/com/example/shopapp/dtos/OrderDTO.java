@@ -6,9 +6,12 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
-import java.time.LocalDate;
+import java.util.LinkedList;
+import java.util.List;
 
-@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
 @Builder
 public class OrderDTO {
     @Min(value = 1, message = "User's ID must be > 0")
@@ -29,19 +32,14 @@ public class OrderDTO {
 
     private String note;
 
+    private String status;
+
     @Min(value = 0, message = "Total money must be >= 0")
     @JsonProperty("total_money")
-    private Float totalMoney;
-
-    @JsonProperty("shipping_method")
-    private String shippingMethod;
-
-    @JsonProperty("shipping_address")
-    private String shippingAddress;
-
-    @JsonProperty("shipping_date")
-    private LocalDate shippingDate;
+    private Double totalMoney;
 
     @JsonProperty("payment_method")
     private String paymentMethod;
+
+    private List<OrderItemDTO> items = new LinkedList<>();
 }

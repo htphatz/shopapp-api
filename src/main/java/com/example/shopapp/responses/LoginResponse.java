@@ -1,10 +1,9 @@
 package com.example.shopapp.responses;
 
-import com.example.shopapp.models.User;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
-@Data // toString
+@Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,6 +16,4 @@ public class LoginResponse {
 
     @JsonProperty("refresh_token")
     private String refreshToken;
-
-    private User user;
 }

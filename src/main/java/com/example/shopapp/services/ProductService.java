@@ -1,19 +1,13 @@
 package com.example.shopapp.services;
 
-import com.example.shopapp.responses.ProductResponse;
 import com.example.shopapp.dtos.ProductDTO;
-import com.example.shopapp.dtos.ProductImageDTO;
 import com.example.shopapp.exceptions.DataNotFoundException;
 import com.example.shopapp.models.Category;
 import com.example.shopapp.models.Product;
-import com.example.shopapp.models.ProductImage;
 import com.example.shopapp.repositories.CategoryRepository;
-import com.example.shopapp.repositories.ProductImageRepository;
 import com.example.shopapp.repositories.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +20,6 @@ import java.util.Optional;
 public class ProductService implements IProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
-    private final ProductImageRepository productImageRepository;
     private final CloudinaryService cloudinaryService;
 
     @Value("${resource.noImageUrl}")
@@ -103,16 +96,4 @@ public class ProductService implements IProductService {
         return productRepository.existsByName(name);
     }
 
-    @Override
-    public ProductImage createProductImage(long productId,
-                                            ProductImageDTO productImageDTO) throws Exception {
-        Product existingProduct = productRepository
-                .findById(productId)
-                .orElseThrow(() -> new DataNotFoundException("Product with id " + productImageDTO.getProductId() + " not found"));
-        ProductImage newProductImage = ProductImage.builder()
-                .product(existingProduct)
-                .imageUrl(productImageDTO.getImageUrl())
-                .build();
-        return productImageRepository.save(newProductImage);
-    }
 }

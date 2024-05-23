@@ -93,7 +93,7 @@ public class ProductController {
             }
             ProductDTO productDTO = ProductDTO.builder()
                     .name(productName)
-                    .price((float)faker.number().numberBetween(10, 90000000))
+                    .price((double)faker.number().numberBetween(10, 90000000))
                     .description(faker.lorem().sentence())
                     .imageUrl("")
                     .categoryId((long)faker.number().numberBetween(5, 9))

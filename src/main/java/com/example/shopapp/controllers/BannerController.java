@@ -59,14 +59,13 @@ public class BannerController {
     }
 
     @PutMapping("/{id}")
-    public ResponseCustom<?> updateBanner(
-            @PathVariable("id") Long id,
+    public ResponseCustom<?> updateBanner(@PathVariable("id") Long id,
             BannerDTO bannerDTO) throws DataNotFoundException {
         try {
             bannerService.updateBanner(id, bannerDTO);
             return new ResponseCustom<>(HttpStatus.ACCEPTED.value(), "Update banner with id " + id + " successfully");
         } catch (Exception e) {
-            return new ResponseCustom<>(HttpStatus.BAD_REQUEST.value(), "Cannot get update banner with id " + id);
+            return new ResponseCustom<>(HttpStatus.BAD_REQUEST.value(), "Cannot update banner with id " + id);
         }
     }
 

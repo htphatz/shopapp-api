@@ -2,6 +2,8 @@ package com.example.shopapp.filters;
 
 import com.example.shopapp.components.JwtTokenUtils;
 import com.example.shopapp.models.User;
+import com.example.shopapp.repositories.UserRepository;
+import com.example.shopapp.responses.ResponseUnauthorized;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,6 +31,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
     private final UserDetailsService userDetailsService;
     private final JwtTokenUtils jwtTokenUtil;
+    private final UserRepository userRepository;
 
     @Override
     protected void doFilterInternal(@NotNull HttpServletRequest request,
@@ -44,10 +47,19 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             final String authHeader = request.getHeader("Authorization");
             if (authHeader != null && authHeader.startsWith("Bearer ")) {
                 final String token = authHeader.substring(7);
-                final String phoneNumber = jwtTokenUtil.extractEmail(token);
-                if (phoneNumber != null &&
+                final String email = jwtTokenUtil.extractSubject(token);
+
+//                userRepository.findByEmail(email).ifPresent(user -> {
+//                    SecurityContextHolder.getContext().setAuthentication(UsernamePasswordAuthenticationToken.authenticated(
+//                            user,
+//                            null,
+//                            user.getAuthorities()
+//                    ));
+//                });
+
+                if (email != null &&
                         SecurityContextHolder.getContext().getAuthentication() == null) {
-                    User userDetails = (User) userDetailsService.loadUserByUsername(phoneNumber);
+                    User userDetails = (User) userDetailsService.loadUserByUsername(email);
                     if (jwtTokenUtil.validateToken(token, userDetails)) {
                         UsernamePasswordAuthenticationToken authenticationToken =
                                 new UsernamePasswordAuthenticationToken(
@@ -58,12 +70,17 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                         authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
                     }
+                    else {
+                        ResponseUnauthorized.writeJsonResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "Token is invalid or expired");
+                        return;
+                    }
                 }
             }
-            filterChain.doFilter(request, response);
         } catch (Exception e) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+            ResponseUnauthorized.writeJsonResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "Token is invalid or expired");
+            return;
         }
+        filterChain.doFilter(request, response);
     }
 
     private boolean isBypassToken(@NotNull HttpServletRequest request) {

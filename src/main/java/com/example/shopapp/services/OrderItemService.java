@@ -1,11 +1,11 @@
 package com.example.shopapp.services;
 
-import com.example.shopapp.dtos.OrderDetailDTO;
+import com.example.shopapp.dtos.OrderItemDTO;
 import com.example.shopapp.exceptions.DataNotFoundException;
 import com.example.shopapp.models.Order;
-import com.example.shopapp.models.OrderDetail;
+import com.example.shopapp.models.OrderItem;
 import com.example.shopapp.models.Product;
-import com.example.shopapp.repositories.OrderDetailRepository;
+import com.example.shopapp.repositories.OrderItemRepository;
 import com.example.shopapp.repositories.OrderRepository;
 import com.example.shopapp.repositories.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,57 +16,57 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class OrderDetailService implements IOrderDetailService {
+public class OrderItemService implements IOrderItemService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
-    private final OrderDetailRepository orderDetailRepository;
+    private final OrderItemRepository orderItemRepository;
 
     @Override
-    public OrderDetail createOrderDetail(OrderDetailDTO orderDetailDTO) throws DataNotFoundException {
-        Order existingOrder = orderRepository.findById(orderDetailDTO.getOrderId())
-                .orElseThrow(() -> new DataNotFoundException("Cannot find order with id " + orderDetailDTO.getOrderId()));
-        Product existingProduct = productRepository.findById(orderDetailDTO.getProductId())
-                .orElseThrow(() -> new DataNotFoundException("Cannot find product with id " + orderDetailDTO.getProductId()));
-        OrderDetail newOrderDetail = OrderDetail.builder()
+    public OrderItem createOrderDetail(OrderItemDTO orderItemDTO) throws DataNotFoundException {
+        Order existingOrder = orderRepository.findById(orderItemDTO.getOrderId())
+                .orElseThrow(() -> new DataNotFoundException("Cannot find order with id " + orderItemDTO.getOrderId()));
+        Product existingProduct = productRepository.findById(orderItemDTO.getProductId())
+                .orElseThrow(() -> new DataNotFoundException("Cannot find product with id " + orderItemDTO.getProductId()));
+        OrderItem newOrderItem = OrderItem.builder()
                 .order(existingOrder)
                 .product(existingProduct)
-                .price(orderDetailDTO.getPrice())
-                .quantity(orderDetailDTO.getQuantity())
+                .price(orderItemDTO.getPrice())
+                .quantity(orderItemDTO.getQuantity())
                 .build();
-        return orderDetailRepository.save(newOrderDetail);
+        return orderItemRepository.save(newOrderItem);
     }
 
     @Override
-    public OrderDetail getOrderDetail(long id) throws DataNotFoundException {
-        return orderDetailRepository.findById(id)
+    public OrderItem getOrderDetail(long id) throws DataNotFoundException {
+        return orderItemRepository.findById(id)
                 .orElseThrow(() -> new DataNotFoundException("Cannot find OrderDetail with id " + id));
     }
 
     @Override
     @Transactional
-    public OrderDetail updateOrderDetail(long id, OrderDetailDTO orderDetailDTO) throws DataNotFoundException {
-        OrderDetail existingOrderDetail = orderDetailRepository.findById(id)
+    public OrderItem updateOrderDetail(long id, OrderItemDTO orderItemDTO) throws DataNotFoundException {
+        OrderItem existingOrderItem = orderItemRepository.findById(id)
                 .orElseThrow(() -> new DataNotFoundException("Cannot find OrderDetail with id" + id));
-        Order existingOrder = orderRepository.findById(orderDetailDTO.getOrderId())
-                .orElseThrow(() -> new DataNotFoundException("Cannot find Order with id " + orderDetailDTO.getOrderId()));
-        Product existingProduct = productRepository.findById(orderDetailDTO.getProductId())
-                .orElseThrow(() -> new DataNotFoundException("Cannot find Product with id " + orderDetailDTO.getProductId()));
-        existingOrderDetail.setOrder(existingOrder);
-        existingOrderDetail.setProduct(existingProduct);
-        existingOrderDetail.setPrice(orderDetailDTO.getPrice());
-        existingOrderDetail.setTotalMoney(orderDetailDTO.getTotalMoney());
-        existingOrderDetail.setQuantity(orderDetailDTO.getQuantity());
-        return orderDetailRepository.save(existingOrderDetail);
+        Order existingOrder = orderRepository.findById(orderItemDTO.getOrderId())
+                .orElseThrow(() -> new DataNotFoundException("Cannot find Order with id " + orderItemDTO.getOrderId()));
+        Product existingProduct = productRepository.findById(orderItemDTO.getProductId())
+                .orElseThrow(() -> new DataNotFoundException("Cannot find Product with id " + orderItemDTO.getProductId()));
+        existingOrderItem.setOrder(existingOrder);
+        existingOrderItem.setProduct(existingProduct);
+        existingOrderItem.setPrice(orderItemDTO.getPrice());
+        existingOrderItem.setTotalMoney(orderItemDTO.getTotalMoney());
+        existingOrderItem.setQuantity(orderItemDTO.getQuantity());
+        return orderItemRepository.save(existingOrderItem);
     }
 
     @Override
     @Transactional
     public void deleteById(long id) {
-        orderDetailRepository.deleteById(id);
+        orderItemRepository.deleteById(id);
     }
 
     @Override
-    public List<OrderDetail> findByOrderId(long orderID) {
-        return orderDetailRepository.findByOrderId(orderID);
+    public List<OrderItem> findByOrderId(long orderID) {
+        return orderItemRepository.findByOrderId(orderID);
     }
 }

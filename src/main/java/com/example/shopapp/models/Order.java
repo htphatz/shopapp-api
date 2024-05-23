@@ -5,6 +5,8 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -36,26 +38,17 @@ public class Order {
     @Column(name = "note", length = 100)
     private String note;
 
-    @Column(name = "order_date")
-    private Date orderDate;
-
     @Column(name = "status")
     private String status;
 
     @Column(name = "total_money")
-    private Float totalMoney;
+    private Double totalMoney;
 
-    @Column(name = "shipping_method")
-    private String shippingMethod;
+    @Column(name = "payment_method")
+    private String paymentMethod;
 
-    @Column(name = "shipping_address", nullable = false)
-    private String shippingAddress;
-
-    @Column(name = "shipping_date")
-    private LocalDate shippingDate;
-
-    @Column(name = "tracking_number")
-    private String trackingNumber;
+//    @JoinColumn(name = "id", referencedColumnName = "id")
+//    private List<OrderDetail> items = new LinkedList<>();
 
     private boolean active;
 }

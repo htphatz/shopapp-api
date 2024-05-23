@@ -78,12 +78,12 @@ public class JwtTokenUtils {
         return expirationDate.before(new Date());
     }
 
-    public String extractEmail(String token) {
+    public String extractSubject(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
     public boolean validateToken(String token, UserDetails userDetails) {
-        String email = extractEmail(token);
+        String email = extractSubject(token);
         return (email.equals(userDetails.getUsername()))
                 && !isTokenExpired(token);
     }

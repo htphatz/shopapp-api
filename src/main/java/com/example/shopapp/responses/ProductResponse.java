@@ -13,7 +13,7 @@ public class ProductResponse extends BaseResponse {
 
     private String name;
 
-    private Float price;
+    private Double price;
 
     private String imageUrl;
 
