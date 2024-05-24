@@ -1,6 +1,6 @@
 package com.example.shopapp.exceptions;
 
-public class RefreshTokenExpiredException extends Exception {
+public class RefreshTokenExpiredException extends RuntimeException {
     public RefreshTokenExpiredException(String message) {
         super(message);
     }

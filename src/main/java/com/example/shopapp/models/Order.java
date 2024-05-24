@@ -3,11 +3,6 @@ package com.example.shopapp.models;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDate;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -46,9 +41,4 @@ public class Order {
 
     @Column(name = "payment_method")
     private String paymentMethod;
-
-//    @JoinColumn(name = "id", referencedColumnName = "id")
-//    private List<OrderDetail> items = new LinkedList<>();
-
-    private boolean active;
 }

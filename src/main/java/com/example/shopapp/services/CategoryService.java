@@ -1,7 +1,7 @@
 package com.example.shopapp.services;
 
 import com.example.shopapp.dtos.CategoryDTO;
-import com.example.shopapp.exceptions.DataNotFoundException;
+import com.example.shopapp.exceptions.ResourceNotFoundException;
 import com.example.shopapp.models.Category;
 import com.example.shopapp.repositories.CategoryRepository;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +39,7 @@ public class CategoryService implements ICategoryService {
     @Override
     public Category getCategoryById(long id) {
         return categoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Cannot found category with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Cannot found category with id: " + id));
     }
 
     @Override
@@ -49,10 +49,10 @@ public class CategoryService implements ICategoryService {
 
     @Override
     @Transactional
-    public Category updateCategory(long id, CategoryDTO categoryDTO) throws DataNotFoundException {
+    public Category updateCategory(long id, CategoryDTO categoryDTO) {
         Category existingCategory = categoryRepository
                 .findById(id)
-                .orElseThrow(() -> new DataNotFoundException("Category with id " + id + " not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Category with id " + id + " not found"));
         existingCategory.setName(categoryDTO.getName());
         existingCategory.setImageUrl(existingCategory.getImageUrl());
         if (categoryDTO.getFileImage() != null && !categoryDTO.getFileImage().isEmpty()) {

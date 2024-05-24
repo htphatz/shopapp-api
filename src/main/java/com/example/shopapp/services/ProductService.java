@@ -1,7 +1,7 @@
 package com.example.shopapp.services;
 
 import com.example.shopapp.dtos.ProductDTO;
-import com.example.shopapp.exceptions.DataNotFoundException;
+import com.example.shopapp.exceptions.ResourceNotFoundException;
 import com.example.shopapp.models.Category;
 import com.example.shopapp.models.Product;
 import com.example.shopapp.repositories.CategoryRepository;
@@ -26,10 +26,10 @@ public class ProductService implements IProductService {
     private String noImageUrl;
 
     @Override
-    public Product createProduct(ProductDTO productDTO) throws DataNotFoundException {
+    public Product createProduct(ProductDTO productDTO) {
         Category existingCategory = categoryRepository
                 .findById(productDTO.getCategoryId())
-                .orElseThrow(() -> new DataNotFoundException("Category with id " + productDTO.getCategoryId() + " not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Category with id " + productDTO.getCategoryId() + " not found"));
         Product newProduct = Product.builder()
                 .name(productDTO.getName())
                 .price(productDTO.getPrice())
@@ -47,9 +47,9 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public Product getProductById(long id) throws DataNotFoundException {
+    public Product getProductById(long id) {
         return productRepository.findById(id)
-                .orElseThrow(() -> new DataNotFoundException("Cannot find product with id " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Cannot find product with id " + id));
     }
 
     @Override
@@ -59,14 +59,14 @@ public class ProductService implements IProductService {
 
     @Override
     @Transactional
-    public Product updateProduct(long id, ProductDTO productDTO) throws DataNotFoundException {
+    public Product updateProduct(long id, ProductDTO productDTO) {
         Product existingProduct = getProductById(id);
         if (existingProduct != null) {
             // Copy cac thuoc tinh tu DTO sang product
             // Co the su dung ModelMapper
             Category existingCategory = categoryRepository
                     .findById(productDTO.getCategoryId())
-                    .orElseThrow(() -> new DataNotFoundException("Category with id " + productDTO.getCategoryId() + " not found"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Category with id " + productDTO.getCategoryId() + " not found"));
             existingProduct.setName(productDTO.getName());
             existingProduct.setPrice(productDTO.getPrice());
             existingProduct.setDescription(productDTO.getDescription());

@@ -2,16 +2,14 @@ package com.example.shopapp.services;
 
 import com.example.shopapp.components.JwtTokenUtils;
 import com.example.shopapp.dtos.UserDTO;
-import com.example.shopapp.exceptions.DataNotFoundException;
 import com.example.shopapp.exceptions.PermissionDenyException;
+import com.example.shopapp.exceptions.ResourceNotFoundException;
 import com.example.shopapp.models.Role;
 import com.example.shopapp.models.User;
 import com.example.shopapp.repositories.RoleRepository;
 import com.example.shopapp.repositories.UserRepository;
 import lombok.Data;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -32,14 +30,14 @@ public class UserService implements IUserService {
     private final AuthenticationManager authenticationManager;
     @Override
     // Register
-    public User createUser(UserDTO userDTO) throws Exception {
+    public User createUser(UserDTO userDTO) {
         String email = userDTO.getEmail();
         // Kiem tra email da dang ky chua
         if (userRepository.existsByEmail(email)) {
             throw new DataIntegrityViolationException("Email already exist");
         }
         Role existingRole = roleRepository.findById(userDTO.getRoleId())
-                .orElseThrow(() -> new DataNotFoundException("Role not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Role not found"));
         if (existingRole.getName().toUpperCase().equals(Role.ADMIN)) {
             throw new PermissionDenyException("You cannot register an admin account");
         }
@@ -60,26 +58,20 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public String login(String email, String password) throws Exception {
+    public String login(String email, String password) {
         Optional<User> optionalUser = userRepository.findByEmail(email);
         if (optionalUser.isEmpty()) {
-            throw new DataNotFoundException("Invalid Email or Password");
+            throw new ResourceNotFoundException("Invalid Email or Password");
         }
-        // return optionalUser.get(); tra JWT token
         User existingUser = optionalUser.get();
         // Check password
         if (!passwordEncoder.matches(password, existingUser.getPassword())) {
             throw new BadCredentialsException("Wrong Email or Password");
         }
-//        Optional<Role> optionalRole = roleRepository.findById(roleId);
-//        if (optionalRole.isEmpty() || !roleId.equals(existingUser.getRole().getId())) {
-//            throw new DataNotFoundException("Role does not exist");
-//        }
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                 email, password,
                 existingUser.getAuthorities()
         );
-        // Authenticate with Java Spring security
         authenticationManager.authenticate(authenticationToken);
         return jwtTokenUtil.generateToken(existingUser);
     }

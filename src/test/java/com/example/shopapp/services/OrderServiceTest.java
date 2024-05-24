@@ -24,7 +24,7 @@ public class OrderServiceTest {
                 .phone("0898993601")
                 .email("vutien.dat.3601@gmail.com")
                 .address("Quan 7, TP HCM")
-                .items(items)
+//                .orderItems(items)
                 .build();
         orderService.createOrder(orderDTO);
     }

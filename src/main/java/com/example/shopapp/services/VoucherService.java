@@ -1,7 +1,7 @@
 package com.example.shopapp.services;
 
 import com.example.shopapp.dtos.VoucherDTO;
-import com.example.shopapp.exceptions.DataNotFoundException;
+import com.example.shopapp.exceptions.ResourceNotFoundException;
 import com.example.shopapp.models.Voucher;
 import com.example.shopapp.repositories.VoucherRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ public class VoucherService implements IVoucherService {
     private final VoucherRepository voucherRepository;
 
     @Override
-    public Voucher createVoucher(VoucherDTO voucherDTO) throws Exception {
+    public Voucher createVoucher(VoucherDTO voucherDTO) {
         Voucher newVoucher = Voucher.builder()
                 .code(voucherDTO.getCode())
                 .discountType(voucherDTO.getDiscountType())
@@ -28,21 +28,21 @@ public class VoucherService implements IVoucherService {
     @Override
     public Voucher getVoucherById(Long id) {
         return voucherRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Cannot find voucher with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Cannot find voucher with id: " + id));
     }
 
     @Override
     public Voucher getVoucherByCode(String code) {
         return voucherRepository.findByCode(code)
-                .orElseThrow(() -> new RuntimeException("Cannot find voucher with code: " + code));
+                .orElseThrow(() -> new ResourceNotFoundException("Cannot find voucher with code: " + code));
     }
 
     @Override
     @Transactional
-    public Voucher updateVoucher(Long id, VoucherDTO voucherDTO) throws DataNotFoundException {
+    public Voucher updateVoucher(Long id, VoucherDTO voucherDTO) {
         Voucher existingVoucher = voucherRepository
                 .findById(id)
-                .orElseThrow(() -> new DataNotFoundException("Voucher with id " + id + " not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Voucher with id " + id + " not found"));
         existingVoucher.setCode(voucherDTO.getCode());
         existingVoucher.setDiscountType(voucherDTO.getDiscountType());
         existingVoucher.setDiscountValue(voucherDTO.getDiscountValue());

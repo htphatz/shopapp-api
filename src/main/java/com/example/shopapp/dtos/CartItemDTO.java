@@ -1,22 +1,17 @@
-package com.example.shopapp.responses;
+package com.example.shopapp.dtos;
 
 import com.example.shopapp.models.OrderItem;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
 
-@Data
+@Getter
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
-public class OrderDetailResponse {
-    private Long id;
-
-    @JsonProperty("order_id")
-    private Long orderId;
-
+public class CartItemDTO {
     @JsonProperty("product_id")
     private Long productId;
 
+    @JsonProperty("price")
     private Double price;
 
     @JsonProperty("quantity")
@@ -25,10 +20,8 @@ public class OrderDetailResponse {
     @JsonProperty("total_money")
     private Double totalMoney;
 
-    public static OrderDetailResponse fromOrderDetail(OrderItem orderItem) {
-        return OrderDetailResponse.builder()
-                .id(orderItem.getId())
-                .orderId(orderItem.getOrder().getId())
+    public static CartItemDTO fromOrderItem(OrderItem orderItem) {
+        return CartItemDTO.builder()
                 .productId(orderItem.getProduct().getId())
                 .price(orderItem.getPrice())
                 .quantity(orderItem.getQuantity())

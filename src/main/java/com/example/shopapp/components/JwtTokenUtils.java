@@ -29,7 +29,7 @@ public class JwtTokenUtils {
     @Value("${jwt.secretKey}")
     private String secretKey;
 
-    public String generateToken(User user) throws Exception{
+    public String generateToken(User user) {
         // Properties => Claims
         Map<String, Object> claims = new HashMap<>();
         // this.generateSecretKey();

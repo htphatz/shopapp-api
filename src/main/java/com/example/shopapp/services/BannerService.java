@@ -1,7 +1,7 @@
 package com.example.shopapp.services;
 
 import com.example.shopapp.dtos.BannerDTO;
-import com.example.shopapp.exceptions.DataNotFoundException;
+import com.example.shopapp.exceptions.ResourceNotFoundException;
 import com.example.shopapp.models.Banner;
 import com.example.shopapp.repositories.BannerRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ public class BannerService implements IBannerService {
     private String noImageUrl;
 
     @Override
-    public Banner createBanner(BannerDTO bannerDTO) throws Exception {
+    public Banner createBanner(BannerDTO bannerDTO) {
         Banner newBanner = Banner.builder()
                 .name(bannerDTO.getName())
                 .description(bannerDTO.getDescription())
@@ -40,7 +40,7 @@ public class BannerService implements IBannerService {
     @Override
     public Banner getBannerById(Long id) {
         return bannerRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Cannot find banner with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Cannot find banner with id: " + id));
     }
 
     @Override
@@ -50,10 +50,10 @@ public class BannerService implements IBannerService {
 
     @Override
     @Transactional
-    public Banner updateBanner(Long id, BannerDTO bannerDTO) throws DataNotFoundException {
+    public Banner updateBanner(Long id, BannerDTO bannerDTO) {
         Banner existingBanner = bannerRepository
                 .findById(id)
-                .orElseThrow(() -> new DataNotFoundException("Banner with id " + id + " not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Banner with id " + id + " not found"));
         existingBanner.setName(bannerDTO.getName());
         existingBanner.setDescription(bannerDTO.getDescription());
         existingBanner.setImageUrl(existingBanner.getImageUrl());

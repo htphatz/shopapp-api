@@ -20,7 +20,7 @@ public class RefreshTokenService {
     @Value("${jwt.refresh-expiration}")
     private int refreshExpiration; // Save to an environment variable
 
-    public RefreshToken createRefreshToken(String phone) throws Exception {
+    public RefreshToken createRefreshToken(String phone) {
         RefreshToken refreshToken =  RefreshToken.builder()
                 .user(userRepository.findByEmail(phone).get()) // Optional<User>
                 .token(UUID.randomUUID().toString())

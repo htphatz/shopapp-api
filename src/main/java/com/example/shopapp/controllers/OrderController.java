@@ -1,20 +1,16 @@
 package com.example.shopapp.controllers;
 
 import com.example.shopapp.dtos.OrderDTO;
-import com.example.shopapp.models.Order;
 import com.example.shopapp.models.User;
 import com.example.shopapp.repositories.UserRepository;
+import com.example.shopapp.responses.ArrayDataResponse;
 import com.example.shopapp.responses.ResponseCustom;
 import com.example.shopapp.services.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -29,90 +25,52 @@ public class OrderController {
     private final UserRepository userRepository;
 
     @PostMapping
-    public ResponseCustom<?> createOrder(
-            @RequestBody  OrderDTO orderDTO,
-            BindingResult result)
-    {
-        try {
-            if (result.hasErrors()) {
-                List<String> errorMessages = result.getFieldErrors()
-                        .stream()
-                        .map(FieldError::getDefaultMessage)
-                        .toList();
-                return new ResponseCustom<>(HttpStatus.BAD_REQUEST.value(), "Create order failed");
-            }
-            Order newOrder = orderService.createOrder(orderDTO);
-            List<Order> orders = new ArrayList<Order>();
-            orders.add(newOrder);
-            return new ResponseCustom<>(HttpStatus.CREATED.value(), "Create banner successfully", orders);
-        } catch (Exception e) {
-            return new ResponseCustom<>(HttpStatus.BAD_REQUEST.value(), e.getMessage());
-        }
+    public ArrayDataResponse<OrderDTO> createOrder(@Valid @RequestBody OrderDTO orderDTO) {
+            OrderDTO newOrder = orderService.createOrder(orderDTO);
+            return new ArrayDataResponse<>(HttpStatus.OK.value(), "Create order successfully", List.of(newOrder));
     }
 
-    @GetMapping("user/{user_id}")
-    public ResponseCustom<List<Order>> getOrdersByUserId(@Valid @PathVariable("user_id") Long id)
-    {
-        try {
-            List<Order> orders = orderService.findByUserId(id);
-            return new ResponseCustom<>(HttpStatus.OK.value(), "Get all orders with user id " + id + " successfully", orders);
-        } catch (Exception e) {
-            return new ResponseCustom<>(HttpStatus.BAD_REQUEST.value(), "Cannot get orders with user id " + id);
-        }
+    @GetMapping("/user/{user_id}")
+    public ResponseCustom<?> getOrdersByUserId(@Valid @PathVariable("user_id") Long id) {
+        List<OrderDTO> orders = orderService.findByUserId(id);
+        return new ResponseCustom<>(HttpStatus.OK.value(), "Get all orders with user id " + id + " successfully", orders);
     }
 
     @GetMapping("/me")
-    public ResponseCustom<List<Order>> getOrdersForCurrentUser()
-    {
+    public ResponseCustom<?> getOrdersOfCurrentUser() {
         UsernamePasswordAuthenticationToken auth = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         User user = (User) auth.getPrincipal();
-        List<Order> orders = orderService.findByUserId(user.getId());
-        return new ResponseCustom<>(HttpStatus.OK.value(), "Get all orders of current user successfully", orders);
-//        try {
-//            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//            String currentUsername = authentication.getName();
-//            Optional<User> optionalUser = userRepository.findByEmail(currentUsername);
-//            if (optionalUser.isEmpty()) {
-//                return ResponseEntity.badRequest().body("Cannot find user with phone: " + currentUsername);
-//            } else {
-//                User currentUser = optionalUser.get();
-//                List<Order> orders = orderService.findByUser(currentUser);
-//                return ResponseEntity.ok(orders);
-//            }
-//        } catch (Exception e) {
-//            return ResponseEntity.badRequest().body(e.getMessage());
-//        }
-//        return null;
+        List<OrderDTO> orders = orderService.findByUserId(user.getId());
+        return new ResponseCustom<>(HttpStatus.OK.value(), "Get all order of me successfully", orders);
     }
 
     @GetMapping("/{id}")
-    public ResponseCustom<?> getOrderById(@Valid @PathVariable("id") long id)
-    {
-        try {
-            Order existingOrder = orderService.getOrderById(id);
-            return new ResponseCustom<>(HttpStatus.OK.value(), "Get order with id " + id + " successfully", existingOrder);
-        } catch (Exception e) {
-            return new ResponseCustom<>(HttpStatus.BAD_REQUEST.value(), "Cannot get order with id " + id);
-        }
+    public ResponseCustom<?> getOrderById(@Valid @PathVariable("id") long id) {
+        OrderDTO existingOrder = orderService.getOrderById(id);
+        return new ResponseCustom<>(HttpStatus.OK.value(), "Get order with id " + id + " successfully", existingOrder);
     }
 
-    @PutMapping("/{id}")
-    public ResponseCustom<?> updateOrder(
-            @Valid @PathVariable("id") Long id,
-            @Valid @RequestBody OrderDTO orderDTO)
-    {
-        try {
-            orderService.updateOrder(id, orderDTO);
-            return new ResponseCustom<>(HttpStatus.ACCEPTED.value(), "Update order with id " + id + " successfully");
-        } catch (Exception e) {
-            return new ResponseCustom<>(HttpStatus.BAD_REQUEST.value(), "Cannot update order with id " + id);
-        }
+    @GetMapping
+    public ResponseCustom<?> getAllOrders() {
+        List<OrderDTO> orders = orderService.getAllOrders();
+        return new ResponseCustom<>(HttpStatus.OK.value(), "Get all order successfully", orders);
+    }
+
+    @GetMapping("/status/{status}")
+    public ResponseCustom<?> getOrdersByStatus(@Valid @PathVariable("status") String status) {
+        List<OrderDTO> orders = orderService.findByStatus(status);
+        return new ResponseCustom<>(HttpStatus.OK.value(), "Get all orders with status " + status + " successfully", orders);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseCustom<?> updateOrder(@Valid @PathVariable("id") Long id, @RequestPart("status") String status) {
+        orderService.updateOrderStatus(id, status);
+        return new ResponseCustom<>(HttpStatus.ACCEPTED.value(), "Update order with id " + id + " successfully");
     }
 
     @DeleteMapping("/{id}")
-    public ResponseCustom<?> deleteOrder(@Valid @PathVariable("id") Long id)
-    {
-        // Xoa mem => cap nhat active = 0
+    public ResponseCustom<?> deleteOrder(@Valid @PathVariable("id") Long id) {
+        // Xoa mem => cap nhat status = cancelled
         orderService.deleteOrder(id);
         return new ResponseCustom<>(HttpStatus.NO_CONTENT.value(), "Delete order with id " + id + " successfully");
     }

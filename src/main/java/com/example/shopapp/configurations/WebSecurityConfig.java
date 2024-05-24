@@ -45,10 +45,10 @@ public class WebSecurityConfig {
                             ).permitAll()
 
                             // Phan quyen xem thong tin sau khi dang nhap
-                            .requestMatchers(GET, String.format("%s/users/me", apiPrefix)).authenticated()
+                            .requestMatchers(HttpMethod.GET, String.format("%s/users/me", apiPrefix)).authenticated()
 
                             // Phan quyen Role
-                            .requestMatchers(GET, String.format("%s/roles**", apiPrefix)).permitAll()
+                            .requestMatchers(HttpMethod.GET, String.format("%s/roles**", apiPrefix)).permitAll()
 
                             // Phan quyen Category
                             .requestMatchers(HttpMethod.GET,
@@ -76,35 +76,25 @@ public class WebSecurityConfig {
 
                             // Phan quyen Order
                             .requestMatchers(HttpMethod.GET,
-                                    String.format("%s/orders/**", apiPrefix)).permitAll()
-                            .requestMatchers(HttpMethod.GET,
-                                    String.format("%s/orders/user/**", apiPrefix)).permitAll()
+                                    String.format("%s/orders**", apiPrefix)).hasRole(Role.ADMIN)
                             .requestMatchers(HttpMethod.GET,
                                     String.format("%s/orders/me", apiPrefix)).authenticated()
+                            .requestMatchers(HttpMethod.GET,
+                                    String.format("%s/orders/**", apiPrefix)).hasRole(Role.ADMIN)
+                            .requestMatchers(HttpMethod.GET,
+                                    String.format("%s/orders/user/**", apiPrefix)).hasRole(Role.ADMIN)
+                            .requestMatchers(HttpMethod.GET,
+                                    String.format("%s/orders/status/**", apiPrefix)).hasRole(Role.ADMIN)
                             .requestMatchers(HttpMethod.POST,
-                                    String.format("%s/orders**", apiPrefix)).permitAll()
-                            .requestMatchers(HttpMethod.PUT,
-                                    String.format("%s/orders/**", apiPrefix)).permitAll()
+                                    String.format("%s/orders**", apiPrefix)).hasRole(Role.USER)
+                            .requestMatchers(HttpMethod.PATCH,
+                                    String.format("%s/orders/**", apiPrefix)).hasRole(Role.ADMIN)
                             .requestMatchers(HttpMethod.DELETE,
-                                    String.format("%s/orders/**", apiPrefix)).permitAll()
-
-                            // Phan quyen Payment
-                            .requestMatchers(HttpMethod.GET,
-                                    String.format("%s/payment**", apiPrefix)).permitAll()
-                            .requestMatchers(HttpMethod.GET,
-                                    String.format("%s/payment/**", apiPrefix)).permitAll()
+                                    String.format("%s/orders/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.USER)
 
                             // Phan quyen OrderDetail
                             .requestMatchers(HttpMethod.GET,
-                                    String.format("%s/order-details/**", apiPrefix)).permitAll()
-                            .requestMatchers(HttpMethod.GET,
-                                    String.format("%s/order-details/order/**", apiPrefix)).permitAll()
-                            .requestMatchers(HttpMethod.POST,
-                                    String.format("%s/order-details**", apiPrefix)).permitAll()
-                            .requestMatchers(HttpMethod.PUT,
-                                    String.format("%s/order-details/**", apiPrefix)).permitAll()
-                            .requestMatchers(HttpMethod.DELETE,
-                                    String.format("%s/order-details/**", apiPrefix)).permitAll()
+                                    String.format("%s/order-details/order/**", apiPrefix)).hasRole(Role.ADMIN)
 
                             // Phan quyen Voucher
                             .requestMatchers(HttpMethod.GET,
