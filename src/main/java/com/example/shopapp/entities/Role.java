@@ -1,16 +1,15 @@
-package com.example.shopapp.models;
+package com.example.shopapp.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
 
 @Data
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "categories")
-public class Category {
+@Table(name = "roles")
+public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -18,6 +17,6 @@ public class Category {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "image_url")
-    private String imageUrl;
+    public static String ADMIN = "ADMIN";
+    public static String USER = "USER";
 }

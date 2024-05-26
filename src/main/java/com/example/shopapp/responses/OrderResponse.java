@@ -1,10 +1,7 @@
 package com.example.shopapp.responses;
 
-import com.example.shopapp.models.Order;
-import com.example.shopapp.models.OrderItem;
-import com.example.shopapp.models.User;
+import com.example.shopapp.entities.Order;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

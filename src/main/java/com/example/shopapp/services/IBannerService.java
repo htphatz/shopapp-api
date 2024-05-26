@@ -1,7 +1,7 @@
 package com.example.shopapp.services;
 
 import com.example.shopapp.dtos.BannerDTO;
-import com.example.shopapp.models.Banner;
+import com.example.shopapp.entities.Banner;
 
 import java.util.List;
 

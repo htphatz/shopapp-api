@@ -1,6 +1,6 @@
 package com.example.shopapp.dtos;
 
-import com.example.shopapp.models.OrderItem;
+import com.example.shopapp.entities.OrderItem;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Getter;

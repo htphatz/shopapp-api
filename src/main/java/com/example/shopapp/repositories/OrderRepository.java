@@ -1,6 +1,6 @@
 package com.example.shopapp.repositories;
 
-import com.example.shopapp.models.Order;
+import com.example.shopapp.entities.Order;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

@@ -2,7 +2,7 @@ package com.example.shopapp.configurations;
 
 import static org.springframework.http.HttpMethod.* ;
 import com.example.shopapp.filters.JwtTokenFilter;
-import com.example.shopapp.models.Role;
+import com.example.shopapp.entities.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -39,13 +39,17 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(requests -> {
                     requests
                             .requestMatchers(
-                                    "%s/users/register".formatted(apiPrefix),
+                                    String.format("%s/users/register", apiPrefix),
                                     String.format("%s/users/login", apiPrefix),
-                                    String.format("%s/users/refreshToken", apiPrefix)
+                                    String.format("%s/users/refreshToken", apiPrefix),
+                                    String.format("%s/users/forgot/**", apiPrefix),
+                                    String.format("%s/users/verifyOtp/**", apiPrefix),
+                                    String.format("%s/users/updatePassword/**", apiPrefix)
                             ).permitAll()
 
-                            // Phan quyen xem thong tin sau khi dang nhap
+                            // Phan quyen sau khi dang nhap
                             .requestMatchers(HttpMethod.GET, String.format("%s/users/me", apiPrefix)).authenticated()
+                            .requestMatchers(HttpMethod.GET, String.format("%s/users/changePassword", apiPrefix)).authenticated()
 
                             // Phan quyen Role
                             .requestMatchers(HttpMethod.GET, String.format("%s/roles**", apiPrefix)).permitAll()
@@ -87,6 +91,8 @@ public class WebSecurityConfig {
                                     String.format("%s/orders/status/**", apiPrefix)).hasRole(Role.ADMIN)
                             .requestMatchers(HttpMethod.POST,
                                     String.format("%s/orders**", apiPrefix)).hasRole(Role.USER)
+                            .requestMatchers(HttpMethod.PATCH,
+                                    String.format("%s/orders/info/**", apiPrefix)).hasRole(Role.USER)
                             .requestMatchers(HttpMethod.PATCH,
                                     String.format("%s/orders/**", apiPrefix)).hasRole(Role.ADMIN)
                             .requestMatchers(HttpMethod.DELETE,

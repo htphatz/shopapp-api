@@ -1,7 +1,7 @@
 package com.example.shopapp.controllers;
 
 import com.example.shopapp.dtos.OrderItemDTO;
-import com.example.shopapp.models.OrderItem;
+import com.example.shopapp.entities.OrderItem;
 import com.example.shopapp.responses.ArrayDataResponse;
 import com.example.shopapp.responses.ResponseCustom;
 import com.example.shopapp.services.OrderItemService;

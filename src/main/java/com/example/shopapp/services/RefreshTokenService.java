@@ -1,6 +1,6 @@
 package com.example.shopapp.services;
 
-import com.example.shopapp.models.RefreshToken;
+import com.example.shopapp.entities.RefreshToken;
 import com.example.shopapp.repositories.RefreshTokenRepository;
 import com.example.shopapp.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;

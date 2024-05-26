@@ -1,12 +1,13 @@
 package com.example.shopapp.dtos;
 
-import com.example.shopapp.models.Order;
+import com.example.shopapp.entities.Order;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -27,10 +28,11 @@ public class OrderDTO {
     private String email;
 
     @NotBlank(message = "Phone number cannot be blank")
-    @Size(min = 9, message = "Phone number must be at least 9 characters")
+    @Pattern(regexp = "^\\d{10}$", message = "Invalid phone format")
     @JsonProperty("phone")
     private String phone;
 
+    @NotBlank(message = "Address cannot be blank")
     private String address;
 
     private String note;
@@ -43,6 +45,12 @@ public class OrderDTO {
 
     @JsonProperty("payment_method")
     private String paymentMethod;
+
+    @JsonProperty("created_at")
+    private LocalDateTime createdAt;
+
+    @JsonProperty("updated_at")
+    private LocalDateTime updatedAt;
 
     @JsonProperty("cart_items")
     private List<CartItemDTO> cartItems = new LinkedList<>();
@@ -59,6 +67,8 @@ public class OrderDTO {
                 .status(order.getStatus())
                 .paymentMethod(order.getPaymentMethod())
                 .totalMoney(order.getTotalMoney())
+                .createdAt(order.getCreatedAt())
+                .updatedAt(order.getUpdatedAt())
                 .build();
     }
 }

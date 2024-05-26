@@ -1,7 +1,7 @@
 package com.example.shopapp.controllers;
 
 import com.example.shopapp.dtos.VoucherDTO;
-import com.example.shopapp.models.Voucher;
+import com.example.shopapp.entities.Voucher;
 import com.example.shopapp.responses.ArrayDataResponse;
 import com.example.shopapp.responses.ResponseCustom;
 import com.example.shopapp.services.VoucherService;

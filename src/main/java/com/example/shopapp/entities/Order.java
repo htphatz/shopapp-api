@@ -1,4 +1,4 @@
-package com.example.shopapp.models;
+package com.example.shopapp.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -9,7 +9,7 @@ import lombok.*;
 @Builder
 @Entity
 @Table(name = "orders")
-public class Order {
+public class Order extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

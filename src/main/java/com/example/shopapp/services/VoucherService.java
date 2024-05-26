@@ -2,11 +2,11 @@ package com.example.shopapp.services;
 
 import com.example.shopapp.dtos.VoucherDTO;
 import com.example.shopapp.exceptions.ResourceNotFoundException;
-import com.example.shopapp.models.Voucher;
+import com.example.shopapp.entities.Voucher;
 import com.example.shopapp.repositories.VoucherRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 

@@ -2,15 +2,15 @@ package com.example.shopapp.services;
 
 import com.example.shopapp.dtos.OrderItemDTO;
 import com.example.shopapp.exceptions.ResourceNotFoundException;
-import com.example.shopapp.models.Order;
-import com.example.shopapp.models.OrderItem;
-import com.example.shopapp.models.Product;
+import com.example.shopapp.entities.Order;
+import com.example.shopapp.entities.OrderItem;
+import com.example.shopapp.entities.Product;
 import com.example.shopapp.repositories.OrderItemRepository;
 import com.example.shopapp.repositories.OrderRepository;
 import com.example.shopapp.repositories.ProductRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 

@@ -1,7 +1,8 @@
 package com.example.shopapp.controllers;
 
 import com.example.shopapp.dtos.OrderDTO;
-import com.example.shopapp.models.User;
+import com.example.shopapp.dtos.ChangeOrderInfoRequest;
+import com.example.shopapp.entities.User;
 import com.example.shopapp.repositories.UserRepository;
 import com.example.shopapp.responses.ArrayDataResponse;
 import com.example.shopapp.responses.ResponseCustom;
@@ -13,9 +14,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("${api.prefix}/orders")
@@ -63,9 +62,15 @@ public class OrderController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseCustom<?> updateOrder(@Valid @PathVariable("id") Long id, @RequestPart("status") String status) {
+    public ResponseCustom<?> updateOrder(@Valid @PathVariable("id") Long id, @Valid @RequestPart("status") String status) {
         orderService.updateOrderStatus(id, status);
         return new ResponseCustom<>(HttpStatus.ACCEPTED.value(), "Update order with id " + id + " successfully");
+    }
+
+    @PatchMapping("/info/{id}")
+    public ResponseCustom<?> updateOrderInfo(@Valid @PathVariable("id") Long id, @Valid ChangeOrderInfoRequest changeOrderInfoRequest) {
+        orderService.updateOrderInfo(id, changeOrderInfoRequest);
+        return new ResponseCustom<>(HttpStatus.ACCEPTED.value(), "Update order's information with id " + id + " successfully");
     }
 
     @DeleteMapping("/{id}")

@@ -1,32 +1,38 @@
 package com.example.shopapp.controllers;
 
 import com.example.shopapp.components.JwtTokenUtils;
-import com.example.shopapp.dtos.RefreshTokenRequest;
-import com.example.shopapp.dtos.UserDTO;
-import com.example.shopapp.dtos.UserLoginDTO;
+import com.example.shopapp.dtos.*;
+import com.example.shopapp.entities.OTPReset;
 import com.example.shopapp.exceptions.RefreshTokenExpiredException;
 import com.example.shopapp.exceptions.ResourceNotFoundException;
-import com.example.shopapp.models.RefreshToken;
-import com.example.shopapp.models.Role;
-import com.example.shopapp.models.User;
+import com.example.shopapp.entities.RefreshToken;
+import com.example.shopapp.entities.Role;
+import com.example.shopapp.entities.User;
+import com.example.shopapp.repositories.OTPResetRepository;
 import com.example.shopapp.repositories.UserRepository;
 import com.example.shopapp.responses.RefreshTokenResponse;
 import com.example.shopapp.responses.LoginResponse;
 import com.example.shopapp.responses.RegisterResponse;
+import com.example.shopapp.responses.ResponseCustom;
+import com.example.shopapp.services.MailService;
 import com.example.shopapp.services.RefreshTokenService;
 import com.example.shopapp.services.UserService;
 import com.example.shopapp.components.LocalizationUtils;
 import com.example.shopapp.utils.MessageKeys;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
 
+
+import java.time.Instant;
+import java.util.Date;
+import java.util.Random;
 
 import static com.example.shopapp.constants.UserConstant.*;
 
@@ -39,6 +45,9 @@ public class UserController {
     private final LocalizationUtils localizationUtils;
     private final JwtTokenUtils jwtTokenUtils;
     private final RefreshTokenService refreshTokenService;
+    private final PasswordEncoder passwordEncoder;
+    private final MailService mailService;
+    private final OTPResetRepository otpResetRepository;
 
     @PostMapping("/register")
     public ResponseEntity<RegisterResponse> createUser(@Valid UserDTO userDTO) {
@@ -81,9 +90,74 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<?> getInformation() throws Exception {
+    public ResponseEntity<?> getInformation() {
         UsernamePasswordAuthenticationToken auth = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         return ResponseEntity.ok(auth.getPrincipal());
     }
 
+    @PostMapping("/changePassword")
+    public ResponseEntity<ResponseCustom<?>> changePassword(@Valid ChangePasswordRequest changePasswordRequest) {
+        UsernamePasswordAuthenticationToken auth = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) auth.getPrincipal();
+        if (!passwordEncoder.matches(changePasswordRequest.getPassword(), user.getPassword())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseCustom<>(HttpStatus.BAD_REQUEST.value(), "Password not matches"));
+        }
+        user.setPassword(passwordEncoder.encode(changePasswordRequest.getNewPassword()));
+        userRepository.save(user);
+        return ResponseEntity.ok(new ResponseCustom<>(HttpStatus.OK.value(), "Change password successfully"));
+    }
+
+    @PostMapping("/forgot/{email}")
+    public ResponseEntity<ResponseCustom<?>> verifyEmail(@PathVariable("email") String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Please provide an valid email!"));
+
+        int otp = generateOTP();
+
+        MailBody mailBody = MailBody.builder()
+                .to(email)
+                .text("Thank you for requesting to reset your account password." + "\n"
+                    + "\nYour OTP code is " + otp + ". \nThis OTP code is valid for 2 minutes."
+                    + "\nPlease enter the OTP code to reset the password for your account." + "\n"
+                    + "\nNote: This OTP code is only for you and must not be shared with anyone else." + "\n"
+                    + "\nBest regards,"
+                    + "\nFrom group 1 with love")
+                .subject("Account confirmation - OTP")
+                .build();
+
+        OTPReset otpReset = OTPReset.builder()
+                .otp(otp)
+                .expirationDate(new Date(System.currentTimeMillis() + 2 * 60 * 1000)) // 2minutes
+                .user(user)
+                .build();
+
+        mailService.sendSimpleMessage(mailBody);
+        otpResetRepository.save(otpReset);
+        return ResponseEntity.ok(new ResponseCustom<>(HttpStatus.OK.value(), "Please check email to have OTP code"));
+    }
+
+    @PostMapping("/updatePassword/{email}")
+    public ResponseEntity<ResponseCustom<?>> updatePassword(@Valid UpdatePasswordRequest updatePasswordRequest, @Valid @PathVariable("email") String email) {
+        String encodedNewPassword = passwordEncoder.encode(updatePasswordRequest.getNewPassword());
+        userRepository.updatePassword(email, encodedNewPassword);
+        return ResponseEntity.ok(new ResponseCustom<>(HttpStatus.OK.value(), "Password has been changed"));
+    }
+
+    @PostMapping("/verifyOtp/{otp}/{email}")
+    public ResponseEntity<ResponseCustom<?>> verifyOtp(@Valid @PathVariable int otp, @Valid @PathVariable String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Please provide an valid email!"));
+        OTPReset otpReset = otpResetRepository.findByOtpAndUser(otp, user)
+                .orElseThrow(() -> new UsernameNotFoundException("Invalid OTP for email " + email));
+        if (otpReset.getExpirationDate().before(Date.from(Instant.now()))) {
+            otpResetRepository.deleteById(otpReset.getId());
+            return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new ResponseCustom<>(HttpStatus.EXPECTATION_FAILED.value(), "OTP has expired!"));
+        }
+        return ResponseEntity.ok(new ResponseCustom<>(HttpStatus.OK.value(), "OTP verified!"));
+    }
+
+    private Integer generateOTP() {
+        Random random = new Random();
+        return random.nextInt(100_000, 999_999);
+    }
 }

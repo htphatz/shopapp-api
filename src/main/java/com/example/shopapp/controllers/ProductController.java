@@ -1,7 +1,7 @@
 package com.example.shopapp.controllers;
 
 import com.example.shopapp.dtos.ProductDTO;
-import com.example.shopapp.models.Product;
+import com.example.shopapp.entities.Product;
 import com.example.shopapp.responses.ArrayDataResponse;
 import com.example.shopapp.responses.ResponseCustom;
 import com.example.shopapp.services.ProductService;

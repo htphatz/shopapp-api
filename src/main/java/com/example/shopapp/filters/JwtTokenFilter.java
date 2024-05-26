@@ -1,7 +1,7 @@
 package com.example.shopapp.filters;
 
 import com.example.shopapp.components.JwtTokenUtils;
-import com.example.shopapp.models.User;
+import com.example.shopapp.entities.User;
 import com.example.shopapp.repositories.UserRepository;
 import com.example.shopapp.responses.ResponseUnauthorized;
 import jakarta.servlet.FilterChain;

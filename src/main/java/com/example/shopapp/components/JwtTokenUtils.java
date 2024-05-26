@@ -1,6 +1,6 @@
 package com.example.shopapp.components;
 
-import com.example.shopapp.models.User;
+import com.example.shopapp.entities.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

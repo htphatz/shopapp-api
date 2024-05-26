@@ -2,15 +2,16 @@ package com.example.shopapp.services;
 
 import com.example.shopapp.dtos.CartItemDTO;
 import com.example.shopapp.dtos.OrderDTO;
+import com.example.shopapp.dtos.ChangeOrderInfoRequest;
 import com.example.shopapp.exceptions.ResourceNotFoundException;
-import com.example.shopapp.models.*;
+import com.example.shopapp.entities.*;
 import com.example.shopapp.repositories.OrderItemRepository;
 import com.example.shopapp.repositories.OrderRepository;
 import com.example.shopapp.repositories.ProductRepository;
 import com.example.shopapp.repositories.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,6 +67,9 @@ public class OrderService implements IOrderService {
         }
         // Lưu danh sách OrderItem vào database
         orderItemRepository.saveAll(orderItems);
+        orderDTO.setId(order.getId());
+        orderDTO.setCreatedAt(order.getCreatedAt());
+        orderDTO.setUpdatedAt(order.getUpdatedAt());
         return orderDTO;
     }
 
@@ -108,6 +112,17 @@ public class OrderService implements IOrderService {
                 .orElseThrow(() -> new ResourceNotFoundException("Cannot found order with id " + id));
         existingOrder.setStatus(status);
         return orderRepository.save(existingOrder);
+    }
+
+    @Override
+    @Transactional
+    public Order updateOrderInfo(long id, ChangeOrderInfoRequest changeOrderInfoRequest) {
+        Order existingOrder = orderRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Cannot found order with id " + id));
+        existingOrder.setFullName(changeOrderInfoRequest.getFullName());
+        existingOrder.setAddress(changeOrderInfoRequest.getAddress());
+        existingOrder.setPhone(changeOrderInfoRequest.getPhone());
+        return existingOrder;
     }
 
     @Override

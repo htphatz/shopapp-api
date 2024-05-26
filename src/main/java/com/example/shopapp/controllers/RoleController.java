@@ -1,6 +1,6 @@
 package com.example.shopapp.controllers;
 
-import com.example.shopapp.models.Role;
+import com.example.shopapp.entities.Role;
 import com.example.shopapp.responses.ResponseCustom;
 import com.example.shopapp.services.RoleService;
 import lombok.RequiredArgsConstructor;

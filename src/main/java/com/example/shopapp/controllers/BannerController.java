@@ -1,7 +1,7 @@
 package com.example.shopapp.controllers;
 
 import com.example.shopapp.dtos.BannerDTO;
-import com.example.shopapp.models.Banner;
+import com.example.shopapp.entities.Banner;
 import com.example.shopapp.responses.ArrayDataResponse;
 import com.example.shopapp.responses.ResponseCustom;
 import com.example.shopapp.services.BannerService;

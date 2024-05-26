@@ -2,12 +2,12 @@ package com.example.shopapp.services;
 
 import com.example.shopapp.dtos.CategoryDTO;
 import com.example.shopapp.exceptions.ResourceNotFoundException;
-import com.example.shopapp.models.Category;
+import com.example.shopapp.entities.Category;
 import com.example.shopapp.repositories.CategoryRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;

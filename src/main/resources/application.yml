@@ -23,10 +23,25 @@ spring:
     basename: i18n/messages
     encoding: UTF-8
     default-locale: en
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: "huynhphat1122003@gmail.com"
+    password: "vsgpwbfodmvcxncz"
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  http:
+    encoding:
+      enabled: true
+      charset: UTF-8
 api:
   prefix: api/v1
 jwt:
-  expiration: 86400 #24hours = 24 * 60 * 60
+  expiration: 1800 #30minutes = 30 * 60
   secretKey: Z7hjrPTXlc9XLzJCO7kyYZWh1DiskWLbplYzgBHIREU=
   refresh-expiration: 604800 #7days = 7 * 24 * 60 * 60
 open:

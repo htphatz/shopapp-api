@@ -1,7 +1,7 @@
 package com.example.shopapp.services;
 
 import com.example.shopapp.dtos.VoucherDTO;
-import com.example.shopapp.models.Voucher;
+import com.example.shopapp.entities.Voucher;
 
 import java.util.List;
 
