@@ -72,7 +72,7 @@ public class UserController {
                     .build());
     }
 
-    @PostMapping("/refreshToken")
+    @PostMapping("/refresh-token")
     public ResponseEntity<?> refreshToken(@Valid RefreshTokenRequest refreshTokenRequest) {
             RefreshToken refreshToken = refreshTokenService.findByToken(refreshTokenRequest.getToken())
                     .orElseThrow(() -> new ResourceNotFoundException("Cannot find refresh token "+ refreshTokenRequest.getToken()));
@@ -95,7 +95,7 @@ public class UserController {
         return ResponseEntity.ok(auth.getPrincipal());
     }
 
-    @PostMapping("/changePassword")
+    @PostMapping("/change-password")
     public ResponseEntity<ResponseCustom<?>> changePassword(@Valid ChangePasswordRequest changePasswordRequest) {
         UsernamePasswordAuthenticationToken auth = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
         User user = (User) auth.getPrincipal();
@@ -136,7 +136,7 @@ public class UserController {
         return ResponseEntity.ok(new ResponseCustom<>(HttpStatus.OK.value(), "Please check email to have OTP code"));
     }
 
-    @PostMapping("/updatePassword/{email}")
+    @PostMapping("/update-password/{email}")
     public ResponseEntity<ResponseCustom<?>> updatePassword(@Valid UpdatePasswordRequest updatePasswordRequest, @Valid @PathVariable("email") String email) {
         String encodedNewPassword = passwordEncoder.encode(updatePasswordRequest.getNewPassword());
         userRepository.updatePassword(email, encodedNewPassword);

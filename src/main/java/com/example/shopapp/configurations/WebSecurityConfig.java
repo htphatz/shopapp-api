@@ -44,15 +44,18 @@ public class WebSecurityConfig {
                                     String.format("%s/users/refreshToken", apiPrefix),
                                     String.format("%s/users/forgot/**", apiPrefix),
                                     String.format("%s/users/verifyOtp/**", apiPrefix),
-                                    String.format("%s/users/updatePassword/**", apiPrefix)
+                                    String.format("%s/users/update-password/**", apiPrefix)
                             ).permitAll()
 
                             // Phan quyen sau khi dang nhap
                             .requestMatchers(HttpMethod.GET, String.format("%s/users/me", apiPrefix)).authenticated()
-                            .requestMatchers(HttpMethod.GET, String.format("%s/users/changePassword", apiPrefix)).authenticated()
+                            .requestMatchers(HttpMethod.GET, String.format("%s/users/change-password", apiPrefix)).authenticated()
 
                             // Phan quyen Role
                             .requestMatchers(HttpMethod.GET, String.format("%s/roles**", apiPrefix)).permitAll()
+
+                            // Phan quyen Admin quan ly doanh thu
+                            .requestMatchers(HttpMethod.GET, String.format("%s/admin/revenue/**", apiPrefix)).hasRole(Role.ADMIN)
 
                             // Phan quyen Category
                             .requestMatchers(HttpMethod.GET,

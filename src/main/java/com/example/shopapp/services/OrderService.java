@@ -55,6 +55,10 @@ public class OrderService implements IOrderService {
             Product product = productRepository.findById(productId)
                     .orElseThrow(() -> new ResourceNotFoundException("Cannot find product with id " + productId));
 
+            // Cập nhật số lượng đã bán cho Product
+            product.setSoldQuantity(product.getSoldQuantity() + quantity);
+            productRepository.save(product); // Lưu lại số lượng đã bán
+
             // Đặt thông tin cho OrderItem
             newOrderItem.setOrder(order);
             newOrderItem.setProduct(product);
@@ -130,10 +134,17 @@ public class OrderService implements IOrderService {
     public void deleteOrder(long id) {
         Order order = orderRepository.findById(id).orElse(null);
         // Xoa mem
-        if (order != null) {
-            order.setStatus(OrderStatus.CANCELLED);
-            orderRepository.save(order);
+        order.setStatus(OrderStatus.CANCELLED);
+
+        // Cập nhật lại số lượng sản phẩm đã bán
+        List<OrderItem> orderItems = orderItemRepository.findByOrderId(id);
+        for (OrderItem orderItem : orderItems) {
+            Product product = orderItem.getProduct();
+            int quantity = orderItem.getQuantity();
+            product.setSoldQuantity(product.getSoldQuantity() - quantity);
+            productRepository.save(product);
         }
+        orderRepository.save(order);
     }
 
     @Override
