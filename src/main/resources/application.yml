@@ -34,6 +34,9 @@ spring:
           auth: true
           starttls:
             enable: true
+  docker:
+    compose:
+      enabled: false
   http:
     encoding:
       enabled: true
@@ -44,6 +47,12 @@ jwt:
   expiration: 1800 #30minutes = 30 * 60
   secretKey: Z7hjrPTXlc9XLzJCO7kyYZWh1DiskWLbplYzgBHIREU=
   refresh-expiration: 604800 #7days = 7 * 24 * 60 * 60
+springdoc:
+  api-docs:
+    path: /apidocs
+  swagger-ui:
+    path: /apidocs.html
+
 open:
   api:
     title: API Documents

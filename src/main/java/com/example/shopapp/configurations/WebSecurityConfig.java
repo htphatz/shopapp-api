@@ -26,8 +26,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WebSecurityConfig {
     private final JwtTokenFilter jwtTokenFilter;
-    private static final String[] PUBLIC_POST_PATTERNS ={"/api/v1/users/login", "/api/v1/users/register"};
-    private static final String[] AUTHENTICATED_GET_PATTERNS={"/api/v1/users/me"};
+    private static final String[] PUBLIC_GET_PATTERNS ={"/apidocs*/**", "/swagger-ui/**"};
     @Value("${api.prefix}")
     private String apiPrefix;
 
@@ -41,7 +40,7 @@ public class WebSecurityConfig {
                             .requestMatchers(
                                     String.format("%s/users/register", apiPrefix),
                                     String.format("%s/users/login", apiPrefix),
-                                    String.format("%s/users/refreshToken", apiPrefix),
+                                    String.format("%s/users/refresh-token", apiPrefix),
                                     String.format("%s/users/forgot/**", apiPrefix),
                                     String.format("%s/users/verifyOtp/**", apiPrefix),
                                     String.format("%s/users/update-password/**", apiPrefix)
@@ -54,8 +53,11 @@ public class WebSecurityConfig {
                             // Phan quyen Role
                             .requestMatchers(HttpMethod.GET, String.format("%s/roles**", apiPrefix)).permitAll()
 
-                            // Phan quyen Admin quan ly doanh thu
+                            // Phan quyen Admin quan ly doanh thu va user
                             .requestMatchers(HttpMethod.GET, String.format("%s/admin/revenue/**", apiPrefix)).hasRole(Role.ADMIN)
+                            .requestMatchers(HttpMethod.PATCH, String.format("%s/users/get-all-user", apiPrefix)).hasRole(Role.ADMIN)
+                            .requestMatchers(HttpMethod.PATCH, String.format("%s/users/disable/**", apiPrefix)).hasRole(Role.ADMIN)
+                            .requestMatchers(HttpMethod.PATCH, String.format("%s/users/enable/**", apiPrefix)).hasRole(Role.ADMIN)
 
                             // Phan quyen Category
                             .requestMatchers(HttpMethod.GET,
@@ -128,9 +130,9 @@ public class WebSecurityConfig {
                                     String.format("%s/banners/**", apiPrefix)).hasRole(Role.ADMIN)
                             .requestMatchers(HttpMethod.DELETE,
                                     String.format("%s/banners/**", apiPrefix)).hasRole(Role.ADMIN)
-                            .requestMatchers(POST, PUBLIC_POST_PATTERNS).permitAll()
-//                            .requestMatchers(GET, PUBLIC_GET_PATTERNS).permitAll()
-//                            .requestMatchers(GET, AUTHENTICATED_GET_PATTERNS).authenticated()
+
+                            .requestMatchers(GET, PUBLIC_GET_PATTERNS).permitAll()
+
                             .anyRequest().authenticated();
                 })
                 .csrf(AbstractHttpConfigurer::disable);
