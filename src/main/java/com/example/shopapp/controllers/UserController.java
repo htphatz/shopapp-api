@@ -7,7 +7,6 @@ import com.example.shopapp.exceptions.ResourceNotFoundException;
 import com.example.shopapp.entities.RefreshToken;
 import com.example.shopapp.entities.Role;
 import com.example.shopapp.entities.User;
-import com.example.shopapp.repositories.UserRepository;
 import com.example.shopapp.responses.RefreshTokenResponse;
 import com.example.shopapp.responses.LoginResponse;
 import com.example.shopapp.responses.RegisterResponse;
@@ -34,7 +33,6 @@ import static com.example.shopapp.constants.UserConstant.*;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
-    private final UserRepository userRepository;
     private final LocalizationUtils localizationUtils;
     private final JwtTokenUtils jwtTokenUtils;
     private final RefreshTokenService refreshTokenService;

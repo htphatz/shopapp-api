@@ -4,6 +4,7 @@ import com.example.shopapp.components.JwtTokenUtils;
 import com.example.shopapp.dtos.MailBody;
 import com.example.shopapp.dtos.UserDTO;
 import com.example.shopapp.entities.OTPReset;
+import com.example.shopapp.exceptions.AccountBlockException;
 import com.example.shopapp.exceptions.OTPExpiredException;
 import com.example.shopapp.exceptions.PermissionDenyException;
 import com.example.shopapp.exceptions.ResourceNotFoundException;
@@ -77,7 +78,7 @@ public class UserService implements IUserService {
         User existingUser = optionalUser.get();
         // Check tài khoản có bị khóa không
         if (!existingUser.isActive()) {
-            throw new PermissionDenyException("Account has been blocked");
+            throw new AccountBlockException("Account has been blocked");
         }
         // Check password
         if (!passwordEncoder.matches(password, existingUser.getPassword())) {

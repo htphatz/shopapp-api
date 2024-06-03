@@ -39,7 +39,6 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                                     @NotNull FilterChain filterChain)
             throws ServletException, IOException {
         try {
-            // filterChain.doFilter(request, response); Enable bypass
             if (isBypassToken(request)) {
                 filterChain.doFilter(request, response);
                 return;
@@ -69,8 +68,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                                 );
                         authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-                    }
-                    else {
+                    } else {
                         ResponseUnauthorized.writeJsonResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "Token is invalid or expired");
                         return;
                     }

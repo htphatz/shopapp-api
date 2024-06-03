@@ -25,15 +25,21 @@ public class VoucherController {
     }
 
     @GetMapping
-    public ResponseCustom<?> getAllVoucher() {
-        List<Voucher> vouchers = voucherService.getAllVouchers();
+    public ResponseCustom<?> getAllVoucherUser() {
+        List<Voucher> vouchers = voucherService.getAllVouchersUser();
+        return new ResponseCustom<>(HttpStatus.OK.value(), "Get all vouchers successfully", vouchers);
+    }
+
+    @GetMapping("/admin")
+    public ResponseCustom<?> getAllVoucherAdmin() {
+        List<Voucher> vouchers = voucherService.getAllVouchersAdmin();
         return new ResponseCustom<>(HttpStatus.OK.value(), "Get all vouchers successfully", vouchers);
     }
 
     @GetMapping("/{code}")
-    public ResponseCustom<?> getVoucherByCode(@Valid @PathVariable("code") String code) {
+    public ArrayDataResponse<Voucher> getVoucherByCode(@Valid @PathVariable("code") String code) {
         Voucher existingVoucher = voucherService.getVoucherByCode(code);
-        return new ResponseCustom<>(HttpStatus.OK.value(), "Get voucher with code " + code + " successfully", existingVoucher);
+        return new ArrayDataResponse<>(HttpStatus.OK.value(), "Get voucher with code " + code + " successfully", List.of(existingVoucher));
     }
 
     @PutMapping("/{id}")
@@ -48,3 +54,4 @@ public class VoucherController {
         return new ResponseCustom<>(HttpStatus.NO_CONTENT.value(), "Delete voucher with id " + id + " successfully");
     }
 }
+

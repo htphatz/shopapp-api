@@ -60,4 +60,19 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleOTPExpiredException(OTPExpiredException e) {
         return ResponseEntity.status(HttpStatus.EXPECTATION_FAILED).body(new ErrorResponse(HttpStatus.EXPECTATION_FAILED.value(), e.getMessage(), ZonedDateTime.now().toEpochSecond()));
     }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ErrorResponse> handleRuntimeException(RuntimeException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), e.getMessage(), ZonedDateTime.now().toEpochSecond()));
+    }
+
+    @ExceptionHandler(AccountBlockException.class)
+    public ResponseEntity<ErrorResponse> handleAccountBlockException(AccountBlockException e) {
+        return ResponseEntity.status(HttpStatus.OK).body(new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), e.getMessage(), ZonedDateTime.now().toEpochSecond()));
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), e.getMessage(), ZonedDateTime.now().toEpochSecond()));
+    }
 }

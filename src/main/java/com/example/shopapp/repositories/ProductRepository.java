@@ -14,7 +14,8 @@ import java.util.List;
 public interface ProductRepository extends JpaRepository<Product, Long> {
     boolean existsByName(String name);
 
-    Page<Product> findAll(Pageable pageable); // Phan trang
+    // Phân trang
+    Page<Product> findAll(Pageable pageable);
 
     @Query("SELECT p FROM Product p WHERE " +
         "(:categoryId IS NULL OR :categoryId = 0 OR p.category.id = :categoryId) " +

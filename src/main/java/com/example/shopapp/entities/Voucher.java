@@ -1,7 +1,12 @@
 package com.example.shopapp.entities;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.Date;
 
 @Data
 @AllArgsConstructor
@@ -22,4 +27,11 @@ public class Voucher {
 
     @Column(name = "discount_value", nullable = false)
     private Double discountValue;
+
+    @Column(name = "term", nullable = false)
+    private Double term;
+
+    @Column(name = "expiration_date", nullable = false)
+    private Date expirationDate;
 }
+

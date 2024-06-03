@@ -18,11 +18,11 @@ public class RefreshTokenService {
     private final RefreshTokenRepository refreshTokenRepository;
 
     @Value("${jwt.refresh-expiration}")
-    private int refreshExpiration; // Save to an environment variable
+    private int refreshExpiration;
 
-    public RefreshToken createRefreshToken(String phone) {
+    public RefreshToken createRefreshToken(String email) {
         RefreshToken refreshToken =  RefreshToken.builder()
-                .user(userRepository.findByEmail(phone).get()) // Optional<User>
+                .user(userRepository.findByEmail(email).get()) // Optional<User>
                 .token(UUID.randomUUID().toString())
                 .expirationDate(Instant.now().plusMillis(refreshExpiration * 1000L))
                 .revoked(false)

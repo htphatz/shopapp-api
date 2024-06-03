@@ -3,7 +3,7 @@ package com.example.shopapp.controllers;
 import com.example.shopapp.dtos.OrderDTO;
 import com.example.shopapp.dtos.ChangeOrderInfoRequest;
 import com.example.shopapp.entities.User;
-import com.example.shopapp.repositories.UserRepository;
+import com.example.shopapp.payment.PaymentService;
 import com.example.shopapp.responses.ArrayDataResponse;
 import com.example.shopapp.responses.ResponseCustom;
 import com.example.shopapp.services.OrderService;
@@ -21,10 +21,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OrderController {
     private final OrderService orderService;
-    private final UserRepository userRepository;
+    private final PaymentService paymentService;
 
     @PostMapping
-    public ArrayDataResponse<OrderDTO> createOrder(@Valid @RequestBody OrderDTO orderDTO) {
+    public ArrayDataResponse<?> createOrder(@Valid @RequestBody OrderDTO orderDTO) {
             OrderDTO newOrder = orderService.createOrder(orderDTO);
             return new ArrayDataResponse<>(HttpStatus.OK.value(), "Create order successfully", List.of(newOrder));
     }
