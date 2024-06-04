@@ -46,7 +46,7 @@ spring:
 api:
   prefix: api/v1
 jwt:
-  expiration: 1800 #30minutes = 30 * 60
+  expiration: 36000 #10hours = 10* 60 * 60
   secretKey: Z7hjrPTXlc9XLzJCO7kyYZWh1DiskWLbplYzgBHIREU=
   refresh-expiration: 604800 #7days = 7 * 24 * 60 * 60
 springdoc:

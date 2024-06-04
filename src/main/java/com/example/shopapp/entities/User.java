@@ -40,6 +40,9 @@ public class User extends BaseEntity implements UserDetails {
     @JoinColumn(name = "role_id")
     private Role role;
 
+    @Column(name = "violated")
+    private boolean violated;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<SimpleGrantedAuthority> authorityList = new ArrayList<>();
